@@ -59,7 +59,7 @@ final readonly class Ok extends Result
     #[Override]
     public function unwrapErr(): never
     {
-        throw new \RuntimeException('called Result::unwrapErr() on an Ok value');
+        throw new \LogicException('called Result::unwrapErr() on an Ok value');
     }
 
     /**
