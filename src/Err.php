@@ -50,7 +50,7 @@ final readonly class Err extends Result
     #[Override]
     public function unwrap(): never
     {
-        throw new \RuntimeException('called Result::unwrap() on an Err value');
+        throw new \LogicException('called Result::unwrap() on an Err value');
     }
 
     /**
