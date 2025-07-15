@@ -4,6 +4,7 @@
 /.phpunit.cache/
 /coverage/
 .DS_Store
+/.php-cs-fixer.cache
 
 # Docker
 .env
