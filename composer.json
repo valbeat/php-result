@@ -1,5 +1,5 @@
 {
-    "name": "valbeat/php-result",
+    "name": "valbeat/result",
     "description": "A Result type implementation for PHP inspired by Rust",
     "type": "library",
     "license": "MIT",
