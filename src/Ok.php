@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Package\Domain\Result;
+namespace Valbeat\Result;
 
 use Override;
 

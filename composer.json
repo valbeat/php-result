@@ -17,12 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Package\\Domain\\Result\\": "src/"
+            "Valbeat\\Result\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Package\\Domain\\Result\\Tests\\": "tests/"
+            "Valbeat\\Result\\Tests\\": "tests/"
         }
     },
     "scripts": {

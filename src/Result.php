@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Package\Domain\Result;
+namespace Valbeat\Result;
 
 /**
  * Result型は、成功（Ok）または失敗（Err）を表現します。
