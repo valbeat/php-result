@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "valbeat"
+    
+  # Composer
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "valbeat"
