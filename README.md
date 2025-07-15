@@ -1,9 +1,5 @@
 # PHP Result
 
-[![Latest Stable Version](https://poser.pugx.org/valbeat/result/v)](https://packagist.org/packages/valbeat/result)
-[![License](https://poser.pugx.org/valbeat/result/license)](https://packagist.org/packages/valbeat/result)
-[![PHP Version Require](https://poser.pugx.org/valbeat/result/require/php)](https://packagist.org/packages/valbeat/result)
-
 A Result type implementation for PHP inspired by Rust's `Result<T, E>` type.
 
 This library provides a robust way to handle operations that might fail, without relying on exceptions. It encourages explicit error handling and makes it impossible to accidentally ignore errors.
@@ -151,23 +147,6 @@ All Result types (both Ok and Err) implement these methods:
 
 #### Pattern Matching
 - `match(callable $okFn, callable $errFn): mixed` - Pattern match on the Result
-
-## Development
-
-### Running Tests
-```bash
-composer test
-```
-
-### Static Analysis
-```bash
-composer phpstan
-```
-
-### Run All Checks
-```bash
-composer check
-```
 
 ## License
 
