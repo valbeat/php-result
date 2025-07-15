@@ -76,9 +76,8 @@ final readonly class Err extends Result
     }
 
     /**
+     * @param callable $op
      * @return mixed
-     *
-     * @phpstan-ignore-next-line
      */
     #[Override]
     public function unwrapOrElse(callable $op): mixed
