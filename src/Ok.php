@@ -20,7 +20,8 @@ final readonly class Ok extends Result
      */
     public function __construct(
         private mixed $value
-    ) {
+    )
+    {
     }
 
     #[Override]
@@ -63,23 +64,23 @@ final readonly class Ok extends Result
     }
 
     /**
-     * @param T $default_value
-     *
+     * @param T $default
      * @return T
      */
     #[Override]
-    public function unwrapOr(mixed $default_value): mixed
+    public function unwrapOr(mixed $default): mixed
     {
         return $this->value;
     }
 
     /**
-     * @param callable(): T $op
+     * @template U
+     * @param callable(never): U $fn
      *
      * @return T
      */
     #[Override]
-    public function unwrapOrElse(callable $op): mixed
+    public function unwrapOrElse(callable $fn): mixed
     {
         return $this->value;
     }
@@ -113,13 +114,13 @@ final readonly class Ok extends Result
     /**
      * @template U
      *
-     * @param U              $default_value
+     * @param U $default
      * @param callable(T): U $fn
      *
      * @return U
      */
     #[Override]
-    public function mapOr(mixed $default_value, callable $fn): mixed
+    public function mapOr(mixed $default, callable $fn): mixed
     {
         return $fn($this->value);
     }
@@ -127,7 +128,7 @@ final readonly class Ok extends Result
     /**
      * @template U
      *
-     * @param callable(): U  $default_fn
+     * @param callable(): U $default_fn
      * @param callable(T): U $fn
      *
      * @return U

@@ -63,26 +63,27 @@ final readonly class Err extends Result
     }
 
     /**
-     * @param mixed $default_value
+     * @template U
+     * @param U $default
      *
-     * @return mixed
-     *
-     * @phpstan-ignore-next-line
+     * @return U
      */
     #[Override]
-    public function unwrapOr(mixed $default_value): mixed
+    public function unwrapOr(mixed $default): mixed
     {
-        return $default_value;
+        /** @var U */
+        return $default;
     }
 
     /**
-     * @param callable $op
-     * @return mixed
+     * @template U
+     * @param callable(E): U $fn
+     * @return U
      */
     #[Override]
-    public function unwrapOrElse(callable $op): mixed
+    public function unwrapOrElse(callable $fn): mixed
     {
-        return $op();
+        return $fn($this->value);
     }
 
     #[Override]
@@ -112,9 +113,9 @@ final readonly class Err extends Result
     }
 
     #[Override]
-    public function mapOr(mixed $default_value, callable $fn): mixed
+    public function mapOr(mixed $default, callable $fn): mixed
     {
-        return $default_value;
+        return $default;
     }
 
     #[Override]

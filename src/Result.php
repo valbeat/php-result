@@ -66,20 +66,21 @@ abstract readonly class Result
     /**
      * 成功値またはデフォルト値を返します.
      *
-     * @param T $default_value
-     *
-     * @return T
+     * @template U
+     * @param U $default
+     * @return T|U
      */
-    abstract public function unwrapOr(mixed $default_value): mixed;
+    abstract public function unwrapOr(mixed $default): mixed;
 
     /**
      * 成功値またはクロージャーの結果を返します.
      *
-     * @param callable(): T $op
+     * @template U
+     * @param callable(E): U $fn
      *
-     * @return T
+     * @return T|U
      */
-    abstract public function unwrapOrElse(callable $op): mixed;
+    abstract public function unwrapOrElse(callable $fn): mixed;
 
     /**
      * 成功値に関数を適用します.
@@ -126,19 +127,19 @@ abstract readonly class Result
      *
      * @template U
      *
-     * @param U              $default_value
+     * @param U $default
      * @param callable(T): U $fn
      *
-     * @return U
+     * @return T|U
      */
-    abstract public function mapOr(mixed $default_value, callable $fn): mixed;
+    abstract public function mapOr(mixed $default, callable $fn): mixed;
 
     /**
      * 成功値に関数を適用するか、クロージャーの結果を返します.
      *
      * @template U
      *
-     * @param callable(): U  $default_fn
+     * @param callable(): U $default_fn
      * @param callable(T): U $fn
      *
      * @return U
@@ -196,7 +197,7 @@ abstract readonly class Result
      * @template U
      * @template V
      *
-     * @param callable(T): U $ok_fn  成功値に適用する関数
+     * @param callable(T): U $ok_fn 成功値に適用する関数
      * @param callable(E): V $err_fn エラー値に適用する関数
      *
      * @return U|V 適用された関数の結果
