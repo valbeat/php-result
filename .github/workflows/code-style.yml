@@ -1,4 +1,4 @@
-name: PHPStan
+name: Code Style
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  phpstan:
-    name: Static Analysis (PHP ${{ matrix.php-version }})
+  php-cs-fixer:
+    name: PHP CS Fixer (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
     
     strategy:
@@ -24,11 +24,7 @@ jobs:
         php-version: ${{ matrix.php-version }}
         coverage: none
     
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-    
     - name: Cache Composer packages
-      id: composer-cache
       uses: actions/cache@v3
       with:
         path: vendor
@@ -39,5 +35,17 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
     
-    - name: Run PHPStan
-      run: composer phpstan
+    - name: Cache PHP CS Fixer
+      uses: actions/cache@v3
+      with:
+        path: .php-cs-fixer.cache
+        key: ${{ runner.os }}-php-cs-fixer-${{ hashFiles('**/.php-cs-fixer.dist.php') }}
+        restore-keys: |
+          ${{ runner.os }}-php-cs-fixer-
+    
+    - name: Run PHP CS Fixer
+      run: composer cs-check
+    
+    - name: Show diff on failure
+      if: failure()
+      run: composer cs-fix -- --diff --dry-run
