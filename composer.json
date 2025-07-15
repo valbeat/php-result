@@ -7,8 +7,8 @@
     "homepage": "https://github.com/valbeat/php-result",
     "authors": [
         {
-            "name": "valbeat",
-            "email": "valbeat@example.com"
+            "name": "Takuma Kajikawa",
+            "email": "kj1ktk@gmail.com"
         }
     ],
     "require": {
