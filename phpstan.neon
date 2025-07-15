@@ -1,0 +1,18 @@
+parameters:
+    level: max
+    paths:
+        - src
+    tmpDir: .phpstan
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+
+    # Strict rules for better type safety
+    checkExplicitMixed: true
+    checkImplicitMixed: true
+    checkBenevolentUnionTypes: true
+    checkUninitializedProperties: true
+    
+    # PHP 8.4 features
+    phpVersion: 80400

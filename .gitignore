@@ -1,0 +1,10 @@
+/vendor/
+/composer.lock
+/.phpstan/
+/.phpunit.cache/
+/coverage/
+.DS_Store
+
+# Docker
+.env
+docker-compose.override.yml

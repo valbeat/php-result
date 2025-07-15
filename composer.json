@@ -1,0 +1,39 @@
+{
+    "name": "valbeat/php-result",
+    "description": "A Result type implementation for PHP inspired by Rust",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "valbeat"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Package\\Domain\\Result\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Package\\Domain\\Result\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse",
+        "check": [
+            "@phpstan",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
