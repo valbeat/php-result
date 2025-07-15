@@ -152,23 +152,6 @@ All Result types (both Ok and Err) implement these methods:
 #### Pattern Matching
 - `match(callable $okFn, callable $errFn): mixed` - Pattern match on the Result
 
-## Comparison with Rust
-
-This implementation closely follows Rust's Result type design:
-
-| Rust | PHP Result |
-|------|------------|
-| `Result<T, E>` | `Result<T, E>` |
-| `Ok(T)` | `new Ok(T)` |
-| `Err(E)` | `new Err(E)` |
-| `is_ok()` | `isOk()` |
-| `is_err()` | `isErr()` |
-| `unwrap()` | `unwrap()` |
-| `unwrap_or()` | `unwrapOr()` |
-| `map()` | `map()` |
-| `and_then()` | `andThen()` |
-| `match` expression | `match()` method |
-
 ## Development
 
 ### Running Tests
