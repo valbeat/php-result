@@ -12,7 +12,6 @@ namespace Valbeat\Result;
  */
 abstract readonly class Result
 {
-
     /**
      * 結果が成功（Ok）の場合に true を返します.
      *

@@ -19,9 +19,8 @@ final readonly class Ok extends Result
      * @param T $value
      */
     public function __construct(
-        private mixed $value
-    )
-    {
+        private mixed $value,
+    ) {
     }
 
     #[Override]

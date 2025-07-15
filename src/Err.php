@@ -19,7 +19,7 @@ final readonly class Err extends Result
      * @param E $value
      */
     public function __construct(
-        private mixed $value
+        private mixed $value,
     ) {
     }
 
