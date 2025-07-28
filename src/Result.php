@@ -10,7 +10,7 @@ namespace Valbeat\Result;
  * @template T 成功時の値の型
  * @template E 失敗時のエラーの型
  */
-abstract readonly class Result
+interface Result
 {
     /**
      * 結果が成功（Ok）の場合に true を返します.
@@ -19,7 +19,7 @@ abstract readonly class Result
      *
      * @return bool
      */
-    abstract public function isOk(): bool;
+    public function isOk(): bool;
 
     /**
      * 結果が成功（Ok）でありコールバックが true を返す場合に true を返します.
@@ -28,7 +28,7 @@ abstract readonly class Result
      *
      * @return bool
      */
-    abstract public function isOkAnd(callable $fn): bool;
+    public function isOkAnd(callable $fn): bool;
 
     /**
      * 結果が失敗（Err）の場合に true を返します.
@@ -37,7 +37,7 @@ abstract readonly class Result
      *
      * @return bool
      */
-    abstract public function isErr(): bool;
+    public function isErr(): bool;
 
     /**
      * 結果が失敗（Err）でありコールバックが true を返す場合に true を返します.
@@ -46,21 +46,21 @@ abstract readonly class Result
      *
      * @return bool
      */
-    abstract public function isErrAnd(callable $fn): bool;
+    public function isErrAnd(callable $fn): bool;
 
     /**
      * 成功値を返します。失敗の場合は例外を投げます.
      *
      * @return T
      */
-    abstract public function unwrap(): mixed;
+    public function unwrap(): mixed;
 
     /**
      * エラー値を返します。成功の場合は例外を投げます.
      *
      * @return E
      */
-    abstract public function unwrapErr(): mixed;
+    public function unwrapErr(): mixed;
 
     /**
      * 成功値またはデフォルト値を返します.
@@ -69,7 +69,7 @@ abstract readonly class Result
      * @param U $default
      * @return T|U
      */
-    abstract public function unwrapOr(mixed $default): mixed;
+    public function unwrapOr(mixed $default): mixed;
 
     /**
      * 成功値またはクロージャーの結果を返します.
@@ -79,7 +79,7 @@ abstract readonly class Result
      *
      * @return T|U
      */
-    abstract public function unwrapOrElse(callable $fn): mixed;
+    public function unwrapOrElse(callable $fn): mixed;
 
     /**
      * 成功値に関数を適用します.
@@ -90,7 +90,7 @@ abstract readonly class Result
      *
      * @return Result<U, E>
      */
-    abstract public function map(callable $fn): self;
+    public function map(callable $fn): self;
 
     /**
      * エラー値に関数を適用します.
@@ -101,7 +101,7 @@ abstract readonly class Result
      *
      * @return Result<T, F>
      */
-    abstract public function mapErr(callable $fn): self;
+    public function mapErr(callable $fn): self;
 
     /**
      * 成功値に副作用を適用します.
@@ -110,7 +110,7 @@ abstract readonly class Result
      *
      * @return Result<T, E>
      */
-    abstract public function inspect(callable $fn): self;
+    public function inspect(callable $fn): self;
 
     /**
      * エラー値に副作用を適用します.
@@ -119,7 +119,7 @@ abstract readonly class Result
      *
      * @return Result<T, E>
      */
-    abstract public function inspectErr(callable $fn): self;
+    public function inspectErr(callable $fn): self;
 
     /**
      * 成功値に関数を適用するか、デフォルト値を返します.
@@ -131,7 +131,7 @@ abstract readonly class Result
      *
      * @return T|U
      */
-    abstract public function mapOr(mixed $default, callable $fn): mixed;
+    public function mapOr(mixed $default, callable $fn): mixed;
 
     /**
      * 成功値に関数を適用するか、クロージャーの結果を返します.
@@ -143,7 +143,7 @@ abstract readonly class Result
      *
      * @return U
      */
-    abstract public function mapOrElse(callable $default_fn, callable $fn): mixed;
+    public function mapOrElse(callable $default_fn, callable $fn): mixed;
 
     /**
      * 成功の場合は第2の結果を返し、失敗の場合は最初のエラーを返します.
@@ -154,7 +154,7 @@ abstract readonly class Result
      *
      * @return Result<U, E>
      */
-    abstract public function and(self $res): self;
+    public function and(self $res): self;
 
     /**
      * 成功の場合は関数を適用し、失敗の場合は現在のエラーを返します.
@@ -165,7 +165,7 @@ abstract readonly class Result
      *
      * @return Result<U, E>
      */
-    abstract public function andThen(callable $fn): self;
+    public function andThen(callable $fn): self;
 
     /**
      * 失敗の場合は第2の結果を返し、成功の場合は最初の値を返します.
@@ -176,7 +176,7 @@ abstract readonly class Result
      *
      * @return Result<T, F>
      */
-    abstract public function or(self $res): self;
+    public function or(self $res): self;
 
     /**
      * 失敗の場合は関数を適用し、成功の場合は現在の値を返します.
@@ -187,7 +187,7 @@ abstract readonly class Result
      *
      * @return Result<T, F>
      */
-    abstract public function orElse(callable $fn): self;
+    public function orElse(callable $fn): self;
 
     /**
      * 成功の場合はok_fnを、失敗の場合はerr_fnを適用します.
@@ -201,5 +201,5 @@ abstract readonly class Result
      *
      * @return U|V 適用された関数の結果
      */
-    abstract public function match(callable $ok_fn, callable $err_fn): mixed;
+    public function match(callable $ok_fn, callable $err_fn): mixed;
 }

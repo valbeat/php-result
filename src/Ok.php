@@ -11,9 +11,9 @@ use Override;
  *
  * @template T
  *
- * @extends Result<T, never>
+ * @implements Result<T, never>
  */
-final readonly class Ok extends Result
+final readonly class Ok implements Result
 {
     /**
      * @param T $value
