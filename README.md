@@ -1,5 +1,7 @@
 # PHP Result
 
+![Packagist Version](https://img.shields.io/packagist/v/valbeat/result)
+
 A Result type implementation for PHP inspired by Rust's `Result<T, E>` type.
 
 This library provides a robust way to handle operations that might fail, without relying on exceptions. It encourages explicit error handling and makes it impossible to accidentally ignore errors.
