@@ -26,21 +26,21 @@ class OkTest extends TestCase
     public function testIsOkAndReturnsTrueWhenCallbackReturnsTrue(): void
     {
         $ok = new Ok(10);
-        $result = $ok->isOkAnd(fn($value) => $value > 5);
+        $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertTrue($result);
     }
 
     public function testIsOkAndReturnsFalseWhenCallbackReturnsFalse(): void
     {
         $ok = new Ok(3);
-        $result = $ok->isOkAnd(fn($value) => $value > 5);
+        $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertFalse($result);
     }
 
     public function testIsErrAndAlwaysReturnsFalse(): void
     {
         $ok = new Ok(42);
-        $result = $ok->isErrAnd(fn($value) => true);
+        $result = $ok->isErrAnd(fn ($value) => true);
         $this->assertFalse($result);
     }
 
@@ -88,14 +88,14 @@ class OkTest extends TestCase
     public function testUnwrapOrElseReturnsValue(): void
     {
         $ok = new Ok(42);
-        $result = $ok->unwrapOrElse(fn() => 100);
+        $result = $ok->unwrapOrElse(fn () => 100);
         $this->assertSame(42, $result);
     }
 
     public function testMapAppliesFunctionToValue(): void
     {
         $ok = new Ok(10);
-        $mapped = $ok->map(fn($x) => $x * 2);
+        $mapped = $ok->map(fn ($x) => $x * 2);
         $this->assertInstanceOf(Ok::class, $mapped);
         $this->assertSame(20, $mapped->unwrap());
     }
@@ -103,15 +103,15 @@ class OkTest extends TestCase
     public function testMapWithTypeChange(): void
     {
         $ok = new Ok(42);
-        $mapped = $ok->map(fn($x) => "Value is: $x");
+        $mapped = $ok->map(fn ($x) => "Value is: $x");
         $this->assertInstanceOf(Ok::class, $mapped);
-        $this->assertSame("Value is: 42", $mapped->unwrap());
+        $this->assertSame('Value is: 42', $mapped->unwrap());
     }
 
     public function testMapErrDoesNothing(): void
     {
         $ok = new Ok(42);
-        $mapped = $ok->mapErr(fn($x) => $x * 2);
+        $mapped = $ok->mapErr(fn ($x) => $x * 2);
         $this->assertSame($ok, $mapped);
         $this->assertSame(42, $mapped->unwrap());
     }
@@ -120,7 +120,7 @@ class OkTest extends TestCase
     {
         $ok = new Ok(42);
         $capturedValue = null;
-        $result = $ok->inspect(function($value) use (&$capturedValue) {
+        $result = $ok->inspect(function ($value) use (&$capturedValue) {
             $capturedValue = $value;
         });
         $this->assertSame(42, $capturedValue);
@@ -131,7 +131,7 @@ class OkTest extends TestCase
     {
         $ok = new Ok(42);
         $called = false;
-        $result = $ok->inspectErr(function() use (&$called) {
+        $result = $ok->inspectErr(function () use (&$called) {
             $called = true;
         });
         $this->assertFalse($called);
@@ -141,14 +141,14 @@ class OkTest extends TestCase
     public function testMapOrAppliesFunction(): void
     {
         $ok = new Ok(10);
-        $result = $ok->mapOr(100, fn($x) => $x * 2);
+        $result = $ok->mapOr(100, fn ($x) => $x * 2);
         $this->assertSame(20, $result);
     }
 
     public function testMapOrElseAppliesFunction(): void
     {
         $ok = new Ok(10);
-        $result = $ok->mapOrElse(fn() => 100, fn($x) => $x * 2);
+        $result = $ok->mapOrElse(fn () => 100, fn ($x) => $x * 2);
         $this->assertSame(20, $result);
     }
 
@@ -173,7 +173,7 @@ class OkTest extends TestCase
     public function testAndThenAppliesFunction(): void
     {
         $ok = new Ok(10);
-        $result = $ok->andThen(fn($x) => new Ok($x * 2));
+        $result = $ok->andThen(fn ($x) => new Ok($x * 2));
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame(20, $result->unwrap());
     }
@@ -181,9 +181,9 @@ class OkTest extends TestCase
     public function testAndThenCanReturnErr(): void
     {
         $ok = new Ok(10);
-        $result = $ok->andThen(fn($x) => new Err("Value too large: $x"));
+        $result = $ok->andThen(fn ($x) => new Err("Value too large: $x"));
         $this->assertInstanceOf(Err::class, $result);
-        $this->assertSame("Value too large: 10", $result->unwrapErr());
+        $this->assertSame('Value too large: 10', $result->unwrapErr());
     }
 
     public function testOrReturnsSelf(): void
@@ -207,7 +207,7 @@ class OkTest extends TestCase
     public function testOrElseReturnsSelf(): void
     {
         $ok = new Ok(42);
-        $result = $ok->orElse(fn() => new Ok(100));
+        $result = $ok->orElse(fn () => new Ok(100));
         $this->assertSame($ok, $result);
         $this->assertSame(42, $result->unwrap());
     }
@@ -216,18 +216,18 @@ class OkTest extends TestCase
     {
         $ok = new Ok(42);
         $result = $ok->match(
-            fn($value) => "Success: $value",
-            fn($error) => "Error: $error"
+            fn ($value) => "Success: $value",
+            fn ($error) => "Error: $error",
         );
-        $this->assertSame("Success: 42", $result);
+        $this->assertSame('Success: 42', $result);
     }
 
     public function testMatchWithDifferentReturnTypes(): void
     {
         $ok = new Ok('hello');
         $result = $ok->match(
-            fn($value) => strlen($value),
-            fn($error) => -1
+            fn ($value) => \strlen($value),
+            fn ($error) => -1,
         );
         $this->assertSame(5, $result);
     }
@@ -265,10 +265,10 @@ class OkTest extends TestCase
     {
         $ok = new Ok(10);
         $result = $ok
-            ->map(fn($x) => $x * 2)
-            ->andThen(fn($x) => new Ok($x + 5))
-            ->map(fn($x) => $x - 3);
-        
+            ->map(fn ($x) => $x * 2)
+            ->andThen(fn ($x) => new Ok($x + 5))
+            ->map(fn ($x) => $x - 3);
+
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame(22, $result->unwrap()); // (10 * 2) + 5 - 3 = 22
     }

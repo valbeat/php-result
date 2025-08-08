@@ -2,6 +2,7 @@ parameters:
     level: max
     paths:
         - src
+        - tests
     tmpDir: .phpstan
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: true
@@ -14,3 +15,12 @@ parameters:
     
     # PHP 8.4 features
     phpVersion: 80400
+    
+    # テストコードで必要なパターンのみ許可（最小限）
+    ignoreErrors:
+        # テストでの型の不一致（意図的なテストケース）
+        - 
+            message: '#Parameter .* expects .*, .* given#'
+            paths:
+                - tests/Unit/OkTest.php
+                - tests/Unit/ErrTest.php

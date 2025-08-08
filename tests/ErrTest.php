@@ -26,21 +26,21 @@ class ErrTest extends TestCase
     public function testIsOkAndAlwaysReturnsFalse(): void
     {
         $err = new Err('error');
-        $result = $err->isOkAnd(fn() => true);
+        $result = $err->isOkAnd(fn () => true);
         $this->assertFalse($result);
     }
 
     public function testIsErrAndReturnsTrueWhenCallbackReturnsTrue(): void
     {
         $err = new Err('critical');
-        $result = $err->isErrAnd(fn($error) => $error === 'critical');
+        $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertTrue($result);
     }
 
     public function testIsErrAndReturnsFalseWhenCallbackReturnsFalse(): void
     {
         $err = new Err('warning');
-        $result = $err->isErrAnd(fn($error) => $error === 'critical');
+        $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertFalse($result);
     }
 
@@ -94,21 +94,21 @@ class ErrTest extends TestCase
     public function testUnwrapOrElseCallsFunction(): void
     {
         $err = new Err('error');
-        $result = $err->unwrapOrElse(fn($error) => "Handled: $error");
+        $result = $err->unwrapOrElse(fn ($error) => "Handled: $error");
         $this->assertSame('Handled: error', $result);
     }
 
     public function testUnwrapOrElseReceivesErrorValue(): void
     {
         $err = new Err(404);
-        $result = $err->unwrapOrElse(fn($code) => $code === 404 ? 'Not Found' : 'Unknown');
+        $result = $err->unwrapOrElse(fn ($code) => $code === 404 ? 'Not Found' : 'Unknown');
         $this->assertSame('Not Found', $result);
     }
 
     public function testMapDoesNotApplyFunction(): void
     {
         $err = new Err('error');
-        $mapped = $err->map(fn($x) => $x * 2);
+        $mapped = $err->map(fn ($x) => $x * 2);
         $this->assertSame($err, $mapped);
         $this->assertSame('error', $mapped->unwrapErr());
     }
@@ -116,7 +116,7 @@ class ErrTest extends TestCase
     public function testMapErrAppliesFunctionToError(): void
     {
         $err = new Err('error');
-        $mapped = $err->mapErr(fn($e) => strtoupper($e));
+        $mapped = $err->mapErr(fn ($e) => strtoupper($e));
         $this->assertInstanceOf(Err::class, $mapped);
         $this->assertSame('ERROR', $mapped->unwrapErr());
     }
@@ -124,7 +124,7 @@ class ErrTest extends TestCase
     public function testMapErrWithTypeChange(): void
     {
         $err = new Err(404);
-        $mapped = $err->mapErr(fn($code) => "Error code: $code");
+        $mapped = $err->mapErr(fn ($code) => "Error code: $code");
         $this->assertInstanceOf(Err::class, $mapped);
         $this->assertSame('Error code: 404', $mapped->unwrapErr());
     }
@@ -133,7 +133,7 @@ class ErrTest extends TestCase
     {
         $err = new Err('error');
         $called = false;
-        $result = $err->inspect(function() use (&$called) {
+        $result = $err->inspect(function () use (&$called) {
             $called = true;
         });
         $this->assertFalse($called);
@@ -144,7 +144,7 @@ class ErrTest extends TestCase
     {
         $err = new Err('error');
         $capturedError = null;
-        $result = $err->inspectErr(function($error) use (&$capturedError) {
+        $result = $err->inspectErr(function ($error) use (&$capturedError) {
             $capturedError = $error;
         });
         $this->assertSame('error', $capturedError);
@@ -154,14 +154,14 @@ class ErrTest extends TestCase
     public function testMapOrReturnsDefault(): void
     {
         $err = new Err('error');
-        $result = $err->mapOr(100, fn($x) => $x * 2);
+        $result = $err->mapOr(100, fn ($x) => $x * 2);
         $this->assertSame(100, $result);
     }
 
     public function testMapOrElseCallsDefaultFunction(): void
     {
         $err = new Err('error');
-        $result = $err->mapOrElse(fn() => 100, fn($x) => $x * 2);
+        $result = $err->mapOrElse(fn () => 100, fn ($x) => $x * 2);
         $this->assertSame(100, $result);
     }
 
@@ -186,7 +186,7 @@ class ErrTest extends TestCase
     public function testAndThenReturnsSelf(): void
     {
         $err = new Err('error');
-        $result = $err->andThen(fn($x) => new Ok($x * 2));
+        $result = $err->andThen(fn ($x) => new Ok($x * 2));
         $this->assertSame($err, $result);
         $this->assertSame('error', $result->unwrapErr());
     }
@@ -212,7 +212,7 @@ class ErrTest extends TestCase
     public function testOrElseCallsFunction(): void
     {
         $err = new Err('error');
-        $result = $err->orElse(fn($e) => new Ok("Recovered from: $e"));
+        $result = $err->orElse(fn ($e) => new Ok("Recovered from: $e"));
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame('Recovered from: error', $result->unwrap());
     }
@@ -220,7 +220,7 @@ class ErrTest extends TestCase
     public function testOrElseCanReturnAnotherErr(): void
     {
         $err = new Err(404);
-        $result = $err->orElse(fn($code) => new Err("HTTP Error: $code"));
+        $result = $err->orElse(fn ($code) => new Err("HTTP Error: $code"));
         $this->assertInstanceOf(Err::class, $result);
         $this->assertSame('HTTP Error: 404', $result->unwrapErr());
     }
@@ -229,8 +229,8 @@ class ErrTest extends TestCase
     {
         $err = new Err('error');
         $result = $err->match(
-            fn($value) => "Success: $value",
-            fn($error) => "Error: $error"
+            fn ($value) => "Success: $value",
+            fn ($error) => "Error: $error",
         );
         $this->assertSame('Error: error', $result);
     }
@@ -239,8 +239,8 @@ class ErrTest extends TestCase
     {
         $err = new Err(404);
         $result = $err->match(
-            fn($value) => ['status' => 'ok', 'data' => $value],
-            fn($error) => ['status' => 'error', 'code' => $error]
+            fn ($value) => ['status' => 'ok', 'data' => $value],
+            fn ($error) => ['status' => 'error', 'code' => $error],
         );
         $this->assertSame(['status' => 'error', 'code' => 404], $result);
     }
@@ -278,10 +278,10 @@ class ErrTest extends TestCase
     {
         $err = new Err('initial error');
         $result = $err
-            ->mapErr(fn($e) => strtoupper($e))
-            ->orElse(fn($e) => new Err("[$e]"))
-            ->mapErr(fn($e) => "Final: $e");
-        
+            ->mapErr(fn ($e) => strtoupper($e))
+            ->orElse(fn ($e) => new Err("[$e]"))
+            ->mapErr(fn ($e) => "Final: $e");
+
         $this->assertInstanceOf(Err::class, $result);
         $this->assertSame('Final: [INITIAL ERROR]', $result->unwrapErr());
     }
@@ -296,11 +296,11 @@ class ErrTest extends TestCase
     {
         $exception = new \RuntimeException('Something went wrong');
         $err = new Err($exception);
-        
+
         $this->assertTrue($err->isErr());
         $this->assertSame($exception, $err->unwrapErr());
-        
-        $handled = $err->mapErr(fn($e) => $e->getMessage());
+
+        $handled = $err->mapErr(fn ($e) => $e->getMessage());
         $this->assertSame('Something went wrong', $handled->unwrapErr());
     }
 }
