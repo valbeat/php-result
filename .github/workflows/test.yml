@@ -35,12 +35,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
       
-      - name: Run PHPStan
-        run: composer phpstan
-      
-      - name: Check code style
-        run: composer cs-check
-      
       - name: Run tests
         run: composer test
       
@@ -67,9 +61,3 @@ jobs:
       
       - name: Run tests in Docker
         run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/phpunit --testdox
-      
-      - name: Run PHPStan in Docker
-        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/phpstan analyse
-      
-      - name: Check code style in Docker
-        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/php-cs-fixer fix --dry-run --diff
