@@ -16,6 +16,7 @@ interface Result
      * 結果が成功（Ok）の場合に true を返します.
      *
      * @phpstan-assert-if-true Ok<T> $this
+     * @phpstan-assert-if-false Err<E> $this
      *
      * @return bool
      */
@@ -34,6 +35,7 @@ interface Result
      * 結果が失敗（Err）の場合に true を返します.
      *
      * @phpstan-assert-if-true Err<E> $this
+     * @phpstan-assert-if-false Ok<T> $this
      *
      * @return bool
      */
@@ -51,14 +53,14 @@ interface Result
     /**
      * 成功値を返します。失敗の場合は例外を投げます.
      *
-     * @return T
+     * @return ($this is Ok<T> ? T : never)
      */
     public function unwrap(): mixed;
 
     /**
      * エラー値を返します。成功の場合は例外を投げます.
      *
-     * @return E
+     * @return ($this is Err<E> ? E : never)
      */
     public function unwrapErr(): mixed;
 
@@ -67,7 +69,7 @@ interface Result
      *
      * @template U
      * @param U $default
-     * @return T|U
+     * @return ($this is Ok<T> ? T : U)
      */
     public function unwrapOr(mixed $default): mixed;
 
