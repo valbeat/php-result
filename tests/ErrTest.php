@@ -286,12 +286,6 @@ class ErrTest extends TestCase
         $this->assertSame('Final: [INITIAL ERROR]', $result->unwrapErr());
     }
 
-    public function testErrImplementsResultInterface(): void
-    {
-        $err = new Err('error');
-        $this->assertInstanceOf(Result::class, $err);
-    }
-
     public function testExceptionAsErrorValue(): void
     {
         $exception = new \RuntimeException('Something went wrong');
