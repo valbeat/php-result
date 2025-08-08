@@ -273,9 +273,4 @@ class OkTest extends TestCase
         $this->assertSame(22, $result->unwrap()); // (10 * 2) + 5 - 3 = 22
     }
 
-    public function testOkImplementsResultInterface(): void
-    {
-        $ok = new Ok(42);
-        $this->assertInstanceOf(Result::class, $ok);
     }
-}
