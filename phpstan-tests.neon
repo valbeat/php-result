@@ -1,0 +1,23 @@
+parameters:
+    level: 5  # テストコードには緩めのレベルを適用
+    paths:
+        - tests
+    tmpDir: .phpstan
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: true
+    
+    # テストコード用の緩い設定
+    checkExplicitMixed: false
+    checkImplicitMixed: false
+    checkBenevolentUnionTypes: false
+    checkUninitializedProperties: false
+    
+    # PHP 8.4 features
+    phpVersion: 80400
+    
+    # テストコードでよくあるパターンを許可
+    ignoreErrors:
+        - '#Call to method .* will always evaluate to (true|false)#'
+        - '#Parameter .* expects .*, .* given#'
+        - '#contains unresolvable type#'
+        - '#Anonymous function should return .* but returns#'
