@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+    
+    name: PHP ${{ matrix.php-version }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: xdebug
+          tools: composer:v2
+      
+      - name: Validate composer.json
+        run: composer validate --strict
+      
+      - name: Cache Composer packages
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Run PHPStan
+        run: composer phpstan
+      
+      - name: Check code style
+        run: composer cs-check
+      
+      - name: Run tests
+        run: composer test
+      
+      - name: Generate coverage report
+        if: matrix.php-version == '8.4'
+        run: ./vendor/bin/phpunit --coverage-clover coverage.xml
+      
+      - name: Upload coverage to Codecov
+        if: matrix.php-version == '8.4'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  docker-test:
+    runs-on: ubuntu-latest
+    name: Docker Test
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: docker build -t php-result-test .
+      
+      - name: Run tests in Docker
+        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/phpunit --testdox
+      
+      - name: Run PHPStan in Docker
+        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/phpstan analyse
+      
+      - name: Check code style in Docker
+        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/php-cs-fixer fix --dry-run --diff
