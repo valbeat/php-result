@@ -6,20 +6,20 @@ namespace Valbeat\Result;
 
 /**
  * Result型は、成功（Ok）または失敗（Err）を表現します。
- * 
+ *
  * ## 基本的な使い方
- * 
+ *
  * ```php
  * use Valbeat\Result\Ok;
  * use Valbeat\Result\Err;
- * 
+ *
  * function divide(float $x, float $y): Result {
  *     if ($y === 0.0) {
  *         return new Err('Division by zero');
  *     }
  *     return new Ok($x / $y);
  * }
- * 
+ *
  * $result = divide(10, 2);
  * if ($result->isOk()) {
  *     echo "Result: " . $result->unwrap(); // Result: 5
@@ -33,13 +33,13 @@ interface Result
 {
     /**
      * 結果が成功（Ok）の場合に true を返します.
-     * 
+     *
      * ## Example
-     * 
+     *
      * ```php
      * $ok = new Ok(42);
      * assert($ok->isOk() === true);
-     * 
+     *
      * $err = new Err('error');
      * assert($err->isOk() === false);
      * ```
@@ -61,13 +61,13 @@ interface Result
 
     /**
      * 結果が失敗（Err）の場合に true を返します.
-     * 
+     *
      * ## Example
-     * 
+     *
      * ```php
      * $ok = new Ok(42);
      * assert($ok->isErr() === false);
-     * 
+     *
      * $err = new Err('error');
      * assert($err->isErr() === true);
      * ```
@@ -122,14 +122,14 @@ interface Result
 
     /**
      * 成功値に関数を適用します.
-     * 
+     *
      * ## Example
-     * 
+     *
      * ```php
      * $result = new Ok(10);
      * $doubled = $result->map(fn($x) => $x * 2);
      * assert($doubled->unwrap() === 20);
-     * 
+     *
      * $error = new Err('failed');
      * $mapped = $error->map(fn($x) => $x * 2);
      * assert($mapped->isErr() === true);
@@ -209,16 +209,16 @@ interface Result
 
     /**
      * 成功の場合は関数を適用し、失敗の場合は現在のエラーを返します.
-     * 
+     *
      * ## Example
-     * 
+     *
      * ```php
      * function checkPositive(int $x): Result {
-     *     return $x > 0 
+     *     return $x > 0
      *         ? new Ok($x)
      *         : new Err('Must be positive');
      * }
-     * 
+     *
      * $result = new Ok(10)
      *     ->andThen(fn($x) => checkPositive($x - 5))
      *     ->andThen(fn($x) => new Ok($x * 2));
@@ -258,9 +258,9 @@ interface Result
     /**
      * 成功の場合はok_fnを、失敗の場合はerr_fnを適用します.
      * RustのResult型のmatch式に相当する機能です.
-     * 
+     *
      * ## Example
-     * 
+     *
      * ```php
      * function processResult(Result $result): string {
      *     return $result->match(
@@ -268,7 +268,7 @@ interface Result
      *         fn($error) => "Error: $error"
      *     );
      * }
-     * 
+     *
      * assert(processResult(new Ok(42)) === 'Success: 42');
      * assert(processResult(new Err('failed')) === 'Error: failed');
      * ```
