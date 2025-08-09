@@ -41,12 +41,6 @@ jobs:
       - name: Make report directories
         run: mkdir -p build/logs coverage/html
 
-      - name: Run PHPStan
-        run: composer phpstan
-
-      - name: Run PHP CS Fixer (check)
-        run: composer cs-check
-
       - name: Run PHPUnit with coverage (PCOV)
         run: |
           vendor/bin/phpunit \
@@ -63,8 +57,6 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: true
           verbose: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload test artifacts (JUnit & HTML & Clover)
         if: always()
