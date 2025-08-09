@@ -48,16 +48,3 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-
-  docker-test:
-    runs-on: ubuntu-latest
-    name: Docker Test
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Build Docker image
-        run: docker build -t php-result-test .
-      
-      - name: Run tests in Docker
-        run: docker run --rm -v "$(pwd)":/app php-result-test ./vendor/bin/phpunit --testdox
