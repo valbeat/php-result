@@ -2,6 +2,7 @@ parameters:
     level: max
     paths:
         - src
+        - tests
     tmpDir: .phpstan
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: true

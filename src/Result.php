@@ -193,7 +193,6 @@ interface Result
 
     /**
      * 成功の場合はok_fnを、失敗の場合はerr_fnを適用します.
-     * RustのResult型のmatch式に相当する機能です.
      *
      * @template U
      * @template V
