@@ -7,7 +7,6 @@ namespace Valbeat\Result\Tests;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
-use Valbeat\Result\Result;
 
 class OkTest extends TestCase
 {
@@ -273,4 +272,4 @@ class OkTest extends TestCase
         $this->assertSame(22, $result->unwrap()); // (10 * 2) + 5 - 3 = 22
     }
 
-    }
+}

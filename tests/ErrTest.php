@@ -7,7 +7,6 @@ namespace Valbeat\Result\Tests;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
-use Valbeat\Result\Result;
 
 class ErrTest extends TestCase
 {
