@@ -4,46 +4,53 @@ declare(strict_types=1);
 
 namespace Valbeat\Result\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
 
 class ErrTest extends TestCase
 {
-    public function testIsOkReturnsFalse(): void
+    #[Test]
+    public function isOk_returns_false(): void
     {
         $err = new Err('error');
         $this->assertFalse($err->isOk());
     }
 
-    public function testIsErrReturnsTrue(): void
+    #[Test]
+    public function isErr_returns_true(): void
     {
         $err = new Err('error');
         $this->assertTrue($err->isErr());
     }
 
-    public function testIsOkAndAlwaysReturnsFalse(): void
+    #[Test]
+    public function isOkAnd_always_returns_false(): void
     {
         $err = new Err('error');
         $result = $err->isOkAnd(fn () => true);
         $this->assertFalse($result);
     }
 
-    public function testIsErrAndReturnsTrueWhenCallbackReturnsTrue(): void
+    #[Test]
+    public function isErrAnd_whenCallbackReturnsTrue_returns_true(): void
     {
         $err = new Err('critical');
         $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertTrue($result);
     }
 
-    public function testIsErrAndReturnsFalseWhenCallbackReturnsFalse(): void
+    #[Test]
+    public function isErrAnd_whenCallbackReturnsFalse_returns_false(): void
     {
         $err = new Err('warning');
         $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertFalse($result);
     }
 
-    public function testUnwrapThrowsException(): void
+    #[Test]
+    public function unwrap_throws_exception(): void
     {
         $err = new Err('error');
         $this->expectException(\LogicException::class);
@@ -51,60 +58,69 @@ class ErrTest extends TestCase
         $err->unwrap();
     }
 
-    public function testUnwrapErrReturnsErrorValue(): void
+    #[Test]
+    public function unwrapErr_returns_error_value(): void
     {
         $err = new Err('error message');
         $this->assertSame('error message', $err->unwrapErr());
     }
 
-    public function testUnwrapErrWithIntValue(): void
+    #[Test]
+    public function unwrapErr_withIntValue_returns_int(): void
     {
         $err = new Err(404);
         $this->assertSame(404, $err->unwrapErr());
     }
 
-    public function testUnwrapErrWithArrayValue(): void
+    #[Test]
+    public function unwrapErr_withArrayValue_returns_array(): void
     {
         $error = ['code' => 500, 'message' => 'Internal Server Error'];
         $err = new Err($error);
         $this->assertSame($error, $err->unwrapErr());
     }
 
-    public function testUnwrapErrWithObjectValue(): void
+    #[Test]
+    public function unwrapErr_withObjectValue_returns_object(): void
     {
         $error = new \Exception('Test exception');
         $err = new Err($error);
         $this->assertSame($error, $err->unwrapErr());
     }
 
-    public function testUnwrapOrReturnsDefault(): void
+    #[Test]
+    public function unwrapOr_returns_default(): void
     {
         $err = new Err('error');
         $this->assertSame(42, $err->unwrapOr(42));
     }
 
-    public function testUnwrapOrWithDifferentTypes(): void
+    #[Test]
+    public function unwrapOr_withDifferentTypes_returns_default(): void
     {
         $err = new Err('error');
         $this->assertSame('default', $err->unwrapOr('default'));
         $this->assertSame(['default'], $err->unwrapOr(['default']));
     }
 
-    public function testUnwrapOrElseCallsFunction(): void
+    #[Test]
+    public function unwrapOrElse_calls_function(): void
     {
         $err = new Err('error');
         $result = $err->unwrapOrElse(fn ($error) => "Handled: $error");
         $this->assertSame('Handled: error', $result);
     }
 
-    public function testUnwrapOrElseReceivesErrorValue(): void
+    #[Test]
+    public function unwrapOrElse_receives_error_value(): void
     {
         $err = new Err(404);
         $result = $err->unwrapOrElse(fn ($code) => $code === 404 ? 'Not Found' : 'Unknown');
         $this->assertSame('Not Found', $result);
     }
 
-    public function testMapDoesNotApplyFunction(): void
+    #[Test]
+    public function map_does_not_apply_function(): void
     {
         $err = new Err('error');
         $mapped = $err->map(fn ($x) => $x * 2);
@@ -112,7 +128,8 @@ class ErrTest extends TestCase
         $this->assertSame('error', $mapped->unwrapErr());
     }
 
-    public function testMapErrAppliesFunctionToError(): void
+    #[Test]
+    public function mapErr_applies_function_to_error(): void
     {
         $err = new Err('error');
         $mapped = $err->mapErr(fn ($e) => strtoupper($e));
@@ -120,7 +137,8 @@ class ErrTest extends TestCase
         $this->assertSame('ERROR', $mapped->unwrapErr());
     }
 
-    public function testMapErrWithTypeChange(): void
+    #[Test]
+    public function mapErr_withTypeChange_transforms_type(): void
     {
         $err = new Err(404);
         $mapped = $err->mapErr(fn ($code) => "Error code: $code");
@@ -128,7 +146,8 @@ class ErrTest extends TestCase
         $this->assertSame('Error code: 404', $mapped->unwrapErr());
     }
 
-    public function testInspectDoesNotCallFunction(): void
+    #[Test]
+    public function inspect_does_not_call_function(): void
     {
         $err = new Err('error');
         $called = false;
@@ -139,7 +158,8 @@ class ErrTest extends TestCase
         $this->assertSame($err, $result);
     }
 
-    public function testInspectErrCallsFunctionWithError(): void
+    #[Test]
+    public function inspectErr_calls_function_with_error(): void
     {
         $err = new Err('error');
         $capturedError = null;
@@ -150,21 +170,24 @@ class ErrTest extends TestCase
         $this->assertSame($err, $result);
     }
 
-    public function testMapOrReturnsDefault(): void
+    #[Test]
+    public function mapOr_returns_default(): void
     {
         $err = new Err('error');
         $result = $err->mapOr(100, fn ($x) => $x * 2);
         $this->assertSame(100, $result);
     }
 
-    public function testMapOrElseCallsDefaultFunction(): void
+    #[Test]
+    public function mapOrElse_calls_default_function(): void
     {
         $err = new Err('error');
         $result = $err->mapOrElse(fn () => 100, fn ($x) => $x * 2);
         $this->assertSame(100, $result);
     }
 
-    public function testAndReturnsSelf(): void
+    #[Test]
+    public function and_returns_self(): void
     {
         $err1 = new Err('error1');
         $ok = new Ok(42);
@@ -173,7 +196,8 @@ class ErrTest extends TestCase
         $this->assertSame('error1', $result->unwrapErr());
     }
 
-    public function testAndWithAnotherErrReturnsSelf(): void
+    #[Test]
+    public function and_withAnotherErr_returns_self(): void
     {
         $err1 = new Err('error1');
         $err2 = new Err('error2');
@@ -182,7 +206,8 @@ class ErrTest extends TestCase
         $this->assertSame('error1', $result->unwrapErr());
     }
 
-    public function testAndThenReturnsSelf(): void
+    #[Test]
+    public function andThen_returns_self(): void
     {
         $err = new Err('error');
         $result = $err->andThen(fn ($x) => new Ok($x * 2));
@@ -190,7 +215,8 @@ class ErrTest extends TestCase
         $this->assertSame('error', $result->unwrapErr());
     }
 
-    public function testOrWithAnotherErrReturnsSecondErr(): void
+    #[Test]
+    public function or_withAnotherErr_returns_second_err(): void
     {
         $err1 = new Err('error1');
         $err2 = new Err('error2');
@@ -199,7 +225,8 @@ class ErrTest extends TestCase
         $this->assertSame('error2', $result->unwrapErr());
     }
 
-    public function testOrElseCanReturnAnotherErr(): void
+    #[Test]
+    public function orElse_canReturnAnotherErr_returns_new_err(): void
     {
         $err = new Err(404);
         $result = $err->orElse(fn ($code) => new Err("HTTP Error: $code"));
@@ -207,7 +234,8 @@ class ErrTest extends TestCase
         $this->assertSame('HTTP Error: 404', $result->unwrapErr());
     }
 
-    public function testMatchCallsErrFunction(): void
+    #[Test]
+    public function match_calls_err_function(): void
     {
         $err = new Err('error');
         $result = $err->match(
@@ -217,7 +245,8 @@ class ErrTest extends TestCase
         $this->assertSame('Error: error', $result);
     }
 
-    public function testMatchWithDifferentReturnTypes(): void
+    #[Test]
+    public function match_withDifferentReturnTypes_returns_err_branch(): void
     {
         $err = new Err(404);
         $result = $err->match(
@@ -227,7 +256,8 @@ class ErrTest extends TestCase
         $this->assertSame(['status' => 'error', 'code' => 404], $result);
     }
 
-    public function testErrWithNullValue(): void
+    #[Test]
+    public function err_withNullValue_handles_null(): void
     {
         $err = new Err(null);
         $this->assertNull($err->unwrapErr());
@@ -235,28 +265,32 @@ class ErrTest extends TestCase
         $this->assertTrue($err->isErr());
     }
 
-    public function testErrWithFalseValue(): void
+    #[Test]
+    public function err_withFalseValue_handles_false(): void
     {
         $err = new Err(false);
         $this->assertFalse($err->unwrapErr());
         $this->assertTrue($err->isErr());
     }
 
-    public function testErrWithZeroValue(): void
+    #[Test]
+    public function err_withZeroValue_handles_zero(): void
     {
         $err = new Err(0);
         $this->assertSame(0, $err->unwrapErr());
         $this->assertTrue($err->isErr());
     }
 
-    public function testErrWithEmptyStringValue(): void
+    #[Test]
+    public function err_withEmptyString_handles_empty_string(): void
     {
         $err = new Err('');
         $this->assertSame('', $err->unwrapErr());
         $this->assertTrue($err->isErr());
     }
 
-    public function testChainingOperations(): void
+    #[Test]
+    public function chainingOperations_applies_transformations(): void
     {
         $err = new Err('initial error');
         $result = $err
@@ -268,7 +302,8 @@ class ErrTest extends TestCase
         $this->assertSame('Final: [INITIAL ERROR]', $result->unwrapErr());
     }
 
-    public function testExceptionAsErrorValue(): void
+    #[Test]
+    public function exceptionAsErrorValue_handles_exception(): void
     {
         $exception = new \RuntimeException('Something went wrong');
         $err = new Err($exception);

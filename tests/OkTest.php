@@ -4,65 +4,75 @@ declare(strict_types=1);
 
 namespace Valbeat\Result\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
 
 class OkTest extends TestCase
 {
-    public function testIsOkReturnsTrue(): void
+    #[Test]
+    public function isOk_returns_true(): void
     {
         $ok = new Ok(42);
         $this->assertTrue($ok->isOk());
     }
 
-    public function testIsErrReturnsFalse(): void
+    #[Test]
+    public function isErr_returns_false(): void
     {
         $ok = new Ok(42);
         $this->assertFalse($ok->isErr());
     }
 
-    public function testIsOkAndReturnsTrueWhenCallbackReturnsTrue(): void
+    #[Test]
+    public function isOkAnd_whenCallbackReturnsTrue_returns_true(): void
     {
         $ok = new Ok(10);
         $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertTrue($result);
     }
 
-    public function testIsOkAndReturnsFalseWhenCallbackReturnsFalse(): void
+    #[Test]
+    public function isOkAnd_whenCallbackReturnsFalse_returns_false(): void
     {
         $ok = new Ok(3);
         $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertFalse($result);
     }
 
-    public function testIsErrAndAlwaysReturnsFalse(): void
+    #[Test]
+    public function isErrAnd_always_returns_false(): void
     {
         $ok = new Ok(42);
         $result = $ok->isErrAnd(fn ($value) => true);
         $this->assertFalse($result);
     }
 
-    public function testUnwrapReturnsValue(): void
+    #[Test]
+    public function unwrap_returns_value(): void
     {
         $ok = new Ok(42);
         $this->assertSame(42, $ok->unwrap());
     }
 
-    public function testUnwrapWithStringValue(): void
+    #[Test]
+    public function unwrap_withStringValue_returns_string(): void
     {
         $ok = new Ok('hello');
         $this->assertSame('hello', $ok->unwrap());
     }
 
-    public function testUnwrapWithArrayValue(): void
+    #[Test]
+    public function unwrap_withArrayValue_returns_array(): void
     {
         $value = ['foo' => 'bar'];
         $ok = new Ok($value);
         $this->assertSame($value, $ok->unwrap());
     }
 
-    public function testUnwrapWithObjectValue(): void
+    #[Test]
+    public function unwrap_withObjectValue_returns_object(): void
     {
         $value = new \stdClass();
         $value->foo = 'bar';
@@ -70,7 +80,8 @@ class OkTest extends TestCase
         $this->assertSame($value, $ok->unwrap());
     }
 
-    public function testUnwrapErrThrowsException(): void
+    #[Test]
+    public function unwrapErr_throws_exception(): void
     {
         $ok = new Ok(42);
         $this->expectException(\LogicException::class);
@@ -78,20 +89,23 @@ class OkTest extends TestCase
         $ok->unwrapErr();
     }
 
-    public function testUnwrapOrReturnsValue(): void
+    #[Test]
+    public function unwrapOr_returns_value(): void
     {
         $ok = new Ok(42);
         $this->assertSame(42, $ok->unwrapOr(100));
     }
 
-    public function testUnwrapOrElseReturnsValue(): void
+    #[Test]
+    public function unwrapOrElse_returns_value(): void
     {
         $ok = new Ok(42);
         $result = $ok->unwrapOrElse(fn () => 100);
         $this->assertSame(42, $result);
     }
 
-    public function testMapAppliesFunctionToValue(): void
+    #[Test]
+    public function map_applies_function_to_value(): void
     {
         $ok = new Ok(10);
         $mapped = $ok->map(fn ($x) => $x * 2);
@@ -99,7 +113,8 @@ class OkTest extends TestCase
         $this->assertSame(20, $mapped->unwrap());
     }
 
-    public function testMapWithTypeChange(): void
+    #[Test]
+    public function map_withTypeChange_transforms_type(): void
     {
         $ok = new Ok(42);
         $mapped = $ok->map(fn ($x) => "Value is: $x");
@@ -107,7 +122,8 @@ class OkTest extends TestCase
         $this->assertSame('Value is: 42', $mapped->unwrap());
     }
 
-    public function testMapErrDoesNothing(): void
+    #[Test]
+    public function mapErr_does_nothing(): void
     {
         $ok = new Ok(42);
         $mapped = $ok->mapErr(fn ($x) => $x * 2);
@@ -115,7 +131,8 @@ class OkTest extends TestCase
         $this->assertSame(42, $mapped->unwrap());
     }
 
-    public function testInspectCallsFunctionWithValue(): void
+    #[Test]
+    public function inspect_calls_function_with_value(): void
     {
         $ok = new Ok(42);
         $capturedValue = null;
@@ -126,7 +143,8 @@ class OkTest extends TestCase
         $this->assertSame($ok, $result);
     }
 
-    public function testInspectErrDoesNotCallFunction(): void
+    #[Test]
+    public function inspectErr_does_not_call_function(): void
     {
         $ok = new Ok(42);
         $called = false;
@@ -137,21 +155,24 @@ class OkTest extends TestCase
         $this->assertSame($ok, $result);
     }
 
-    public function testMapOrAppliesFunction(): void
+    #[Test]
+    public function mapOr_applies_function(): void
     {
         $ok = new Ok(10);
         $result = $ok->mapOr(100, fn ($x) => $x * 2);
         $this->assertSame(20, $result);
     }
 
-    public function testMapOrElseAppliesFunction(): void
+    #[Test]
+    public function mapOrElse_applies_function(): void
     {
         $ok = new Ok(10);
         $result = $ok->mapOrElse(fn () => 100, fn ($x) => $x * 2);
         $this->assertSame(20, $result);
     }
 
-    public function testAndReturnsSecondResult(): void
+    #[Test]
+    public function and_returns_second_result(): void
     {
         $ok1 = new Ok(42);
         $ok2 = new Ok('hello');
@@ -160,7 +181,8 @@ class OkTest extends TestCase
         $this->assertSame('hello', $result->unwrap());
     }
 
-    public function testAndThenAppliesFunction(): void
+    #[Test]
+    public function andThen_applies_function(): void
     {
         $ok = new Ok(10);
         $result = $ok->andThen(fn ($x) => new Ok($x * 2));
@@ -168,7 +190,8 @@ class OkTest extends TestCase
         $this->assertSame(20, $result->unwrap());
     }
 
-    public function testOrReturnsSelf(): void
+    #[Test]
+    public function or_returns_self(): void
     {
         $ok1 = new Ok(42);
         $ok2 = new Ok(100);
@@ -177,7 +200,8 @@ class OkTest extends TestCase
         $this->assertSame(42, $result->unwrap());
     }
 
-    public function testOrWithErrReturnsSelf(): void
+    #[Test]
+    public function or_withErr_returns_self(): void
     {
         $ok = new Ok(42);
         $err = new Err('error');
@@ -186,7 +210,8 @@ class OkTest extends TestCase
         $this->assertSame(42, $result->unwrap());
     }
 
-    public function testOrElseReturnsSelf(): void
+    #[Test]
+    public function orElse_returns_self(): void
     {
         $ok = new Ok(42);
         $result = $ok->orElse(fn () => new Ok(100));
@@ -194,7 +219,8 @@ class OkTest extends TestCase
         $this->assertSame(42, $result->unwrap());
     }
 
-    public function testMatchCallsOkFunction(): void
+    #[Test]
+    public function match_calls_ok_function(): void
     {
         $ok = new Ok(42);
         $result = $ok->match(
@@ -204,7 +230,8 @@ class OkTest extends TestCase
         $this->assertSame('Success: 42', $result);
     }
 
-    public function testMatchWithDifferentReturnTypes(): void
+    #[Test]
+    public function match_withDifferentReturnTypes_returns_ok_branch(): void
     {
         $ok = new Ok('hello');
         $result = $ok->match(
@@ -214,7 +241,8 @@ class OkTest extends TestCase
         $this->assertSame(5, $result);
     }
 
-    public function testOkWithNullValue(): void
+    #[Test]
+    public function ok_withNullValue_handles_null(): void
     {
         $ok = new Ok(null);
         $this->assertNull($ok->unwrap());
@@ -222,28 +250,32 @@ class OkTest extends TestCase
         $this->assertFalse($ok->isErr());
     }
 
-    public function testOkWithFalseValue(): void
+    #[Test]
+    public function ok_withFalseValue_handles_false(): void
     {
         $ok = new Ok(false);
         $this->assertFalse($ok->unwrap());
         $this->assertTrue($ok->isOk());
     }
 
-    public function testOkWithZeroValue(): void
+    #[Test]
+    public function ok_withZeroValue_handles_zero(): void
     {
         $ok = new Ok(0);
         $this->assertSame(0, $ok->unwrap());
         $this->assertTrue($ok->isOk());
     }
 
-    public function testOkWithEmptyStringValue(): void
+    #[Test]
+    public function ok_withEmptyString_handles_empty_string(): void
     {
         $ok = new Ok('');
         $this->assertSame('', $ok->unwrap());
         $this->assertTrue($ok->isOk());
     }
 
-    public function testChainingOperations(): void
+    #[Test]
+    public function chainingOperations_applies_transformations(): void
     {
         $ok = new Ok(10);
         $result = $ok
@@ -254,5 +286,4 @@ class OkTest extends TestCase
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame(22, $result->unwrap()); // (10 * 2) + 5 - 3 = 22
     }
-
 }
