@@ -1,6 +1,7 @@
 # PHP Result
 
 ![Packagist Version](https://img.shields.io/packagist/v/valbeat/result)
+[![codecov](https://codecov.io/gh/valbeat/php-result/branch/main/graph/badge.svg?token=B1P4MQMP7J)](https://codecov.io/gh/valbeat/php-result)
 
 A Result type implementation for PHP inspired by Rust's `Result<T, E>` type.
 
