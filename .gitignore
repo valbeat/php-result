@@ -7,6 +7,3 @@
 .DS_Store
 /.php-cs-fixer.cache
 
-# Docker
-.env
-docker-compose.override.yml
