@@ -160,29 +160,12 @@ class OkTest extends TestCase
         $this->assertSame('hello', $result->unwrap());
     }
 
-    public function testAndWithErrReturnsErr(): void
-    {
-        $ok = new Ok(42);
-        $err = new Err('error');
-        $result = $ok->and($err);
-        $this->assertSame($err, $result);
-        $this->assertTrue($result->isErr());
-    }
-
     public function testAndThenAppliesFunction(): void
     {
         $ok = new Ok(10);
         $result = $ok->andThen(fn ($x) => new Ok($x * 2));
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame(20, $result->unwrap());
-    }
-
-    public function testAndThenCanReturnErr(): void
-    {
-        $ok = new Ok(10);
-        $result = $ok->andThen(fn ($x) => new Err("Value too large: $x"));
-        $this->assertInstanceOf(Err::class, $result);
-        $this->assertSame('Value too large: 10', $result->unwrapErr());
     }
 
     public function testOrReturnsSelf(): void

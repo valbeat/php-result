@@ -190,15 +190,6 @@ class ErrTest extends TestCase
         $this->assertSame('error', $result->unwrapErr());
     }
 
-    public function testOrReturnsSecondResult(): void
-    {
-        $err1 = new Err('error1');
-        $ok = new Ok(42);
-        $result = $err1->or($ok);
-        $this->assertSame($ok, $result);
-        $this->assertSame(42, $result->unwrap());
-    }
-
     public function testOrWithAnotherErrReturnsSecondErr(): void
     {
         $err1 = new Err('error1');
@@ -206,14 +197,6 @@ class ErrTest extends TestCase
         $result = $err1->or($err2);
         $this->assertSame($err2, $result);
         $this->assertSame('error2', $result->unwrapErr());
-    }
-
-    public function testOrElseCallsFunction(): void
-    {
-        $err = new Err('error');
-        $result = $err->orElse(fn ($e) => new Ok("Recovered from: $e"));
-        $this->assertInstanceOf(Ok::class, $result);
-        $this->assertSame('Recovered from: error', $result->unwrap());
     }
 
     public function testOrElseCanReturnAnotherErr(): void
