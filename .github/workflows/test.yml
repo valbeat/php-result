@@ -63,7 +63,7 @@ jobs:
         with:
           files: build/logs/junit.xml
           flags: unittests
-          fail_ci_if_error: false
+          fail_ci_if_error: true
 
       - name: Upload test artifacts (JUnit & HTML & Clover)
         if: always()
