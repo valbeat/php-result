@@ -18,7 +18,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          coverage: xdebug
+          coverage: pcov
+          ini-values: pcov.directory=src
           tools: composer:v2
       
       - name: Validate composer.json
@@ -35,16 +36,33 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
       
-      - name: Run tests
-        run: composer test
+      - name: Run PHPStan
+        run: composer phpstan
       
-      - name: Generate coverage report
-        run: ./vendor/bin/phpunit --coverage-clover coverage.xml
+      - name: Run PHP CS Fixer check
+        run: composer cs-check
+      
+      - name: Run PHPUnit with coverage (PCOV)
+        run: |
+          vendor/bin/phpunit \
+            --coverage-clover build/logs/clover.xml \
+            --coverage-html coverage/html \
+            --log-junit build/logs/junit.xml \
+            --colors=always
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage.xml
+          files: ./build/logs/clover.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            build/logs/
+            coverage/html/
