@@ -50,11 +50,10 @@ jobs:
             --colors=always
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: build/logs/clover.xml
           flags: unittests
-          name: codecov-umbrella
           fail_ci_if_error: true
           verbose: true
 
