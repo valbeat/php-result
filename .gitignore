@@ -4,6 +4,7 @@
 /.phpunit.cache/
 /.phpunit.result.cache
 /coverage/
+/build/
 .DS_Store
 /.php-cs-fixer.cache
 
