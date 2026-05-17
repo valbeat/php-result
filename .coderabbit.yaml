@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: ja
+early_access: false
+tone_instructions: |
+  日本語で簡潔かつ建設的にレビューしてください。
+  指摘の根拠（PHPのバージョン依存、型安全性、Result型の不変条件など）を明示してください。
+
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  path_filters:
+    - "!vendor/**"
+    - "!**/*.lock"
+    - "!.phpunit.result.cache"
+    - "!.php-cs-fixer.cache"
+    - "!.phpstan/**"
+
+  path_instructions:
+    - path: "src/**/*.php"
+      instructions: |
+        - PHP 8.4 以上の構文・機能を前提にレビューする。
+        - Rust の Result<T, E> に倣った API 設計を尊重し、Ok / Err / Result の不変条件を崩していないか確認する。
+        - 例外による暗黙のエラー伝播ではなく、Result 型での明示的なエラーハンドリングを推奨する。
+        - readonly / final / 型宣言（戻り値・引数・プロパティ）の徹底をチェックする。
+        - 公開 API の破壊的変更がある場合は明示的に指摘する。
+    - path: "tests/**/*.php"
+      instructions: |
+        - PHPUnit のテストとして、t-wada 流 TDD の Red→Green→Refactor を意識しているかをチェックする。
+        - 1 テスト 1 アサーション主義に偏りすぎず、振る舞い単位で検証されているか確認する。
+        - エッジケース（Ok/Err 双方、ネスト、map/and_then などのコンビネータ）が網羅されているかを見る。
+    - path: "**/*.md"
+      instructions: |
+        - サンプルコードは PHP 8.4+ で実行可能か確認する。
+        - README の API 説明と src の実装が一致しているかを確認する。
+    - path: ".github/workflows/**"
+      instructions: |
+        - 使用するアクションはバージョンを固定（SHA か明示的なタグ）しているかを確認する。
+        - secrets の取り扱いに不適切なものがないかをチェックする。
+
+  tools:
+    phpstan:
+      enabled: true
+      level: default
+    phpmd:
+      enabled: false
+    github-checks:
+      enabled: true
+      timeout_ms: 90000
+    languagetool:
+      enabled: true
+      enabled_only: false
+      level: default
+    markdownlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    actionlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+
+chat:
+  auto_reply: true
