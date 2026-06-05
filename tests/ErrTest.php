@@ -216,6 +216,16 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function andThen_withDifferentErrorType_keeps_original_error(): void
+    {
+        $err = new Err(self::asString('validation failed'));
+        $result = $err->andThen(fn ($x) => new Err(new \DomainException('unreachable')));
+
+        $this->assertSame($err, $result);
+        $this->assertSame('validation failed', $result->unwrapErr());
+    }
+
+    #[Test]
     public function or_withAnotherErr_returns_second_err(): void
     {
         $err1 = new Err('error1');
@@ -232,6 +242,16 @@ class ErrTest extends TestCase
         $result = $err->orElse(fn ($code) => new Err("HTTP Error: $code"));
         $this->assertInstanceOf(Err::class, $result);
         $this->assertSame('HTTP Error: 404', $result->unwrapErr());
+    }
+
+    #[Test]
+    public function orElse_withDifferentSuccessType_recovers(): void
+    {
+        $err = new Err(self::asString('original'));
+        $result = $err->orElse(fn ($e) => new Ok(\strlen($e)));
+
+        $this->assertInstanceOf(Ok::class, $result);
+        $this->assertSame(8, $result->unwrap());
     }
 
     #[Test]

@@ -191,6 +191,32 @@ class OkTest extends TestCase
     }
 
     #[Test]
+    public function andThen_withDifferentErrorType_chains_results(): void
+    {
+        $ok = new Ok(self::asInt(10));
+        $result = $ok->andThen(
+            fn ($x) => $x > 5 ? new Ok("value: $x") : new Err(new \DomainException('too small')),
+        );
+
+        $this->assertInstanceOf(Ok::class, $result);
+        $this->assertSame('value: 10', $result->unwrap());
+    }
+
+    #[Test]
+    public function andThen_withDifferentErrorType_returns_new_err(): void
+    {
+        $ok = new Ok(self::asInt(3));
+        $result = $ok->andThen(
+            fn ($x) => $x > 5 ? new Ok("value: $x") : new Err(new \DomainException('too small')),
+        );
+
+        $this->assertInstanceOf(Err::class, $result);
+        $error = $result->unwrapErr();
+        $this->assertInstanceOf(\DomainException::class, $error);
+        $this->assertSame('too small', $error->getMessage());
+    }
+
+    #[Test]
     public function or_returns_self(): void
     {
         $ok1 = new Ok(42);
