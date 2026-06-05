@@ -36,7 +36,7 @@ class ErrTest extends TestCase
     #[Test]
     public function isErrAnd_whenCallbackReturnsTrue_returns_true(): void
     {
-        $err = new Err('critical');
+        $err = new Err(self::asString('critical'));
         $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertTrue($result);
     }
@@ -44,7 +44,7 @@ class ErrTest extends TestCase
     #[Test]
     public function isErrAnd_whenCallbackReturnsFalse_returns_false(): void
     {
-        $err = new Err('warning');
+        $err = new Err(self::asString('warning'));
         $result = $err->isErrAnd(fn ($error) => $error === 'critical');
         $this->assertFalse($result);
     }
@@ -114,7 +114,7 @@ class ErrTest extends TestCase
     #[Test]
     public function unwrapOrElse_receives_error_value(): void
     {
-        $err = new Err(404);
+        $err = new Err(self::asInt(404));
         $result = $err->unwrapOrElse(fn ($code) => $code === 404 ? 'Not Found' : 'Unknown');
         $this->assertSame('Not Found', $result);
     }
@@ -313,5 +313,21 @@ class ErrTest extends TestCase
 
         $handled = $err->mapErr(fn ($e) => $e->getMessage());
         $this->assertSame('Something went wrong', $handled->unwrapErr());
+    }
+
+    /**
+     * リテラル型を int に広げます（共変テンプレートは定数型を保持するため）.
+     */
+    private static function asInt(int $value): int
+    {
+        return $value;
+    }
+
+    /**
+     * リテラル型を string に広げます（共変テンプレートは定数型を保持するため）.
+     */
+    private static function asString(string $value): string
+    {
+        return $value;
     }
 }

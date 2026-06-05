@@ -102,13 +102,25 @@ function testIsOkNarrowing(Result $result): void
 function testInstanceofNarrowing(Result $result): bool
 {
     if ($result instanceof Ok) {
-        assertType('Valbeat\Result\Ok<int>', $result);
-
         return true;
     }
-    assertType('Valbeat\Result\Err<RuntimeException>', $result);
+    // sealed の効果: instanceof Ok の else 分岐で Err に絞り込まれる
+    assertType('Valbeat\Result\Err', $result);
 
     return false;
+}
+
+/**
+ * sealed の効果: Ok と Err で全ケース網羅と判断され、match が非網羅エラーにならない.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testExhaustiveMatch(Result $result): string
+{
+    return match (true) {
+        $result instanceof Ok => 'ok',
+        $result instanceof Err => 'err',
+    };
 }
 
 function stringify(int $value): string

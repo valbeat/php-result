@@ -9,7 +9,7 @@ use Override;
 /**
  * Err はエラー値を表します.
  *
- * @template E
+ * @template-covariant E
  *
  * @implements Result<never, E>
  */

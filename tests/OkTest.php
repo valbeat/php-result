@@ -28,7 +28,7 @@ class OkTest extends TestCase
     #[Test]
     public function isOkAnd_whenCallbackReturnsTrue_returns_true(): void
     {
-        $ok = new Ok(10);
+        $ok = new Ok(self::asInt(10));
         $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertTrue($result);
     }
@@ -36,7 +36,7 @@ class OkTest extends TestCase
     #[Test]
     public function isOkAnd_whenCallbackReturnsFalse_returns_false(): void
     {
-        $ok = new Ok(3);
+        $ok = new Ok(self::asInt(3));
         $result = $ok->isOkAnd(fn ($value) => $value > 5);
         $this->assertFalse($result);
     }
@@ -285,5 +285,13 @@ class OkTest extends TestCase
 
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame(22, $result->unwrap()); // (10 * 2) + 5 - 3 = 22
+    }
+
+    /**
+     * リテラル型を int に広げます（共変テンプレートは定数型を保持するため）.
+     */
+    private static function asInt(int $value): int
+    {
+        return $value;
     }
 }

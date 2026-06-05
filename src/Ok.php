@@ -9,7 +9,7 @@ use Override;
 /**
  * Ok は成功値を表します.
  *
- * @template T
+ * @template-covariant T
  *
  * @implements Result<T, never>
  */
@@ -63,7 +63,8 @@ final readonly class Ok implements Result
     }
 
     /**
-     * @param T $default
+     * @template U
+     * @param U $default
      * @return T
      */
     #[Override]
