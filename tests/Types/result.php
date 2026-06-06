@@ -124,6 +124,17 @@ function testExhaustiveMatch(Result $result): string
 }
 
 /**
+ * ネストした Result の平坦化: andThen が内側の成功型と両エラー型の合成を推論できる.
+ *
+ * @param Result<Result<int, RuntimeException>, LogicException> $nested
+ */
+function testNestedResultFlattening(Result $nested): void
+{
+    $flattened = $nested->andThen(static fn (Result $inner): Result => $inner);
+    assertType('Valbeat\Result\Result<int, LogicException|RuntimeException>', $flattened);
+}
+
+/**
  * 具象 Ok レシーバでは no-op 側のメソッドが実行時に起こり得ない型を混ぜない.
  *
  * @param Ok<int> $ok

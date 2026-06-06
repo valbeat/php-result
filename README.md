@@ -90,15 +90,24 @@ Each step in a chain may fail with a **different error type**. The error types
 are composed into a union, so PHPStan tracks every error the chain can produce:
 
 ```php
-/** @return Result<UserId, ValidationError> */
-function validateUserId(string $raw): Result { /* ... */ }
+final class ValidationError {}
+final class NotFoundError {}
 
-/** @return Result<User, NotFoundError> */
-function findUserById(UserId $id): Result { /* ... */ }
+/** @return Result<int, ValidationError> */
+function validateUserId(string $raw): Result
+{
+    return ctype_digit($raw) ? new Ok((int) $raw) : new Err(new ValidationError());
+}
 
-// PHPStan infers Result<User, ValidationError|NotFoundError>
-$user = validateUserId($request['id'])
-    ->andThen(findUserById(...));
+/** @return Result<string, NotFoundError> */
+function findUserNameById(int $id): Result
+{
+    return $id === 42 ? new Ok('Alice') : new Err(new NotFoundError());
+}
+
+// PHPStan infers Result<string, ValidationError|NotFoundError>
+$userName = validateUserId('42')->andThen(findUserNameById(...));
+echo $userName->unwrap(); // "Alice"
 ```
 
 ### Combining Results
