@@ -123,6 +123,44 @@ function testExhaustiveMatch(Result $result): string
     };
 }
 
+/**
+ * 具象 Ok レシーバでは no-op 側のメソッドが実行時に起こり得ない型を混ぜない.
+ *
+ * @param Ok<int> $ok
+ */
+function testConcreteOkPrecision(Ok $ok): void
+{
+    // or/orElse は $this を返すため Ok<int> のまま
+    assertType('Valbeat\Result\Ok<int>', $ok->orElse(static fn (never $e): Result => findNameById(0)));
+    assertType('Valbeat\Result\Ok<int>', $ok->or(findNameById(0)));
+    // mapErr は no-op
+    assertType('Valbeat\Result\Ok<int>', $ok->mapErr(static fn (never $e): LogicException => $e));
+    // map は Ok<U> を返す
+    assertType('Valbeat\Result\Ok<string>', $ok->map(stringify(...)));
+    // mapOr/mapOrElse は常に $fn の結果（デフォルト値の型は混ざらない）
+    assertType('string', $ok->mapOr(0.5, stringify(...)));
+    assertType('string', $ok->mapOrElse(static fn (): float => 0.5, stringify(...)));
+}
+
+/**
+ * 具象 Err レシーバでは no-op 側のメソッドが実行時に起こり得ない型を混ぜない.
+ *
+ * @param Err<RuntimeException> $err
+ */
+function testConcreteErrPrecision(Err $err, float $fallback): void
+{
+    // and/andThen は $this を返すため Err<RuntimeException> のまま
+    assertType('Valbeat\Result\Err<RuntimeException>', $err->andThen(static fn (never $v): Result => findNameById(0)));
+    assertType('Valbeat\Result\Err<RuntimeException>', $err->and(findNameById(0)));
+    // map は no-op
+    assertType('Valbeat\Result\Err<RuntimeException>', $err->map(static fn (never $v): int => $v));
+    // mapErr は Err<F> を返す
+    assertType('Valbeat\Result\Err<LogicException>', $err->mapErr(static fn (RuntimeException $e): LogicException => new LogicException($e->getMessage())));
+    // mapOr/mapOrElse は常にデフォルト側（$fn の戻り値型は混ざらない）
+    assertType('float', $err->mapOr($fallback, static fn (never $v): string => $v));
+    assertType('float', $err->mapOrElse(static fn (): float => $fallback, static fn (never $v): string => $v));
+}
+
 function stringify(int $value): string
 {
     return 'value: ' . $value;

@@ -86,24 +86,40 @@ final readonly class Err implements Result
         return $fn($this->value);
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function map(callable $fn): Result
     {
         return $this;
     }
 
+    /**
+     * @template F
+     *
+     * @param callable(E): F $fn
+     *
+     * @return Err<F>
+     */
     #[Override]
     public function mapErr(callable $fn): Result
     {
         return new self($fn($this->value));
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function inspect(callable $fn): Result
     {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function inspectErr(callable $fn): Result
     {
@@ -112,24 +128,48 @@ final readonly class Err implements Result
         return $this;
     }
 
+    /**
+     * @template U
+     * @template V
+     *
+     * @param U $default
+     * @param callable(never): V $fn
+     *
+     * @return U
+     */
     #[Override]
     public function mapOr(mixed $default, callable $fn): mixed
     {
         return $default;
     }
 
+    /**
+     * @template U
+     * @template V
+     *
+     * @param callable(): U $default_fn
+     * @param callable(never): V $fn
+     *
+     * @return U
+     */
     #[Override]
     public function mapOrElse(callable $default_fn, callable $fn): mixed
     {
         return $default_fn();
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function and(Result $res): Result
     {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function andThen(callable $fn): Result
     {

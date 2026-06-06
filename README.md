@@ -144,10 +144,15 @@ and leans on several of its generics features:
   `Result<User, DbError>` can simply `return new Ok($user);`.
 - **Error-type composition** — `andThen()`/`and()` widen the error channel to
   `E|F` and `orElse()`/`or()` widen the success channel to `T|U`, so chains that
-  mix failure types stay precisely typed.
+  mix failure types stay precisely typed. (This deliberately diverges from Rust,
+  whose `and`/`or` family keeps the other channel's type fixed.)
 - **Type narrowing** — `isOk()`/`isErr()` narrow `$result` to `Ok<T>`/`Err<E>`
-  via `@phpstan-assert-if-true`, and `unwrap()`/`unwrapErr()`/`unwrapOr()` use
-  conditional return types (`never` on the impossible side).
+  via `@phpstan-assert-if-true`; `unwrap()`/`unwrapErr()` use conditional return
+  types (`never` on the impossible side), and `unwrapOr()`/`unwrapOrElse()`
+  resolve to `T` on `Ok` and to the default's type on `Err`.
+- **Precise concrete receivers** — when the receiver is statically `Ok<T>` or
+  `Err<E>`, no-op methods keep their exact type (`$ok->orElse(...)` stays
+  `Ok<T>`, `$err->andThen(...)` stays `Err<E>`) instead of widening to a union.
 
 Note: because the templates are covariant, PHPStan preserves constant value types
 (`new Ok(10)` is `Ok<10>`, not `Ok<int>`). Type a variable or parameter as `int`
