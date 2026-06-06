@@ -7,8 +7,10 @@ namespace Valbeat\Result;
 /**
  * Result型は、成功（Ok）または失敗（Err）を表現します。
  *
- * @template T 成功時の値の型
- * @template E 失敗時のエラーの型
+ * @template-covariant T 成功時の値の型
+ * @template-covariant E 失敗時のエラーの型
+ *
+ * @phpstan-sealed Ok|Err
  */
 interface Result
 {
@@ -53,14 +55,14 @@ interface Result
     /**
      * 成功値を返します。失敗の場合は例外を投げます.
      *
-     * @return ($this is Ok<T> ? T : never)
+     * @return ($this is Ok<mixed> ? T : never)
      */
     public function unwrap(): mixed;
 
     /**
      * エラー値を返します。成功の場合は例外を投げます.
      *
-     * @return ($this is Err<E> ? E : never)
+     * @return ($this is Err<mixed> ? E : never)
      */
     public function unwrapErr(): mixed;
 
@@ -69,7 +71,7 @@ interface Result
      *
      * @template U
      * @param U $default
-     * @return ($this is Ok<T> ? T : U)
+     * @return ($this is Ok<mixed> ? T : U)
      */
     public function unwrapOr(mixed $default): mixed;
 
@@ -79,7 +81,7 @@ interface Result
      * @template U
      * @param callable(E): U $fn
      *
-     * @return T|U
+     * @return ($this is Ok<mixed> ? T : U)
      */
     public function unwrapOrElse(callable $fn): mixed;
 
@@ -131,7 +133,7 @@ interface Result
      * @param U $default
      * @param callable(T): U $fn
      *
-     * @return T|U
+     * @return U
      */
     public function mapOr(mixed $default, callable $fn): mixed;
 
@@ -151,43 +153,51 @@ interface Result
      * 成功の場合は第2の結果を返し、失敗の場合は最初のエラーを返します.
      *
      * @template U
+     * @template F
      *
-     * @param Result<U, E> $res
+     * @param Result<U, F> $res
      *
-     * @return Result<U, E>
+     * @return Result<U, E|F>
      */
     public function and(self $res): self;
 
     /**
      * 成功の場合は関数を適用し、失敗の場合は現在のエラーを返します.
      *
+     * 関数は元と異なるエラー型を返せます。エラー型は E|F に合成されます.
+     *
      * @template U
+     * @template F
      *
-     * @param callable(T): Result<U, E> $fn
+     * @param callable(T): Result<U, F> $fn
      *
-     * @return Result<U, E>
+     * @return Result<U, E|F>
      */
     public function andThen(callable $fn): self;
 
     /**
      * 失敗の場合は第2の結果を返し、成功の場合は最初の値を返します.
      *
+     * @template U
      * @template F
      *
-     * @param Result<T, F> $res
+     * @param Result<U, F> $res
      *
-     * @return Result<T, F>
+     * @return Result<T|U, F>
      */
     public function or(self $res): self;
 
     /**
      * 失敗の場合は関数を適用し、成功の場合は現在の値を返します.
      *
+     * 関数は元と異なる成功型を返せます。成功型は T|U に合成されます.
+     *
+     * @template U
      * @template F
      *
-     * @param callable(E): Result<T, F> $fn
+     * @param callable(E): Result<U, F> $fn
      *
-     * @return Result<T, F>
+     * @return Result<T|U, F>
      */
     public function orElse(callable $fn): self;
 

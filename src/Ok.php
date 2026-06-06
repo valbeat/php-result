@@ -9,7 +9,7 @@ use Override;
 /**
  * Ok は成功値を表します.
  *
- * @template T
+ * @template-covariant T
  *
  * @implements Result<T, never>
  */
@@ -63,7 +63,8 @@ final readonly class Ok implements Result
     }
 
     /**
-     * @param T $default
+     * @template U
+     * @param U $default
      * @return T
      */
     #[Override]
@@ -84,18 +85,31 @@ final readonly class Ok implements Result
         return $this->value;
     }
 
+    /**
+     * @template U
+     *
+     * @param callable(T): U $fn
+     *
+     * @return Ok<U>
+     */
     #[Override]
     public function map(callable $fn): Result
     {
         return new self($fn($this->value));
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function mapErr(callable $fn): Result
     {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function inspect(callable $fn): Result
     {
@@ -104,6 +118,9 @@ final readonly class Ok implements Result
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function inspectErr(callable $fn): Result
     {
@@ -112,8 +129,9 @@ final readonly class Ok implements Result
 
     /**
      * @template U
+     * @template V
      *
-     * @param U $default
+     * @param V $default
      * @param callable(T): U $fn
      *
      * @return U
@@ -126,8 +144,9 @@ final readonly class Ok implements Result
 
     /**
      * @template U
+     * @template V
      *
-     * @param callable(): U $default_fn
+     * @param callable(): V $default_fn
      * @param callable(T): U $fn
      *
      * @return U
@@ -150,12 +169,18 @@ final readonly class Ok implements Result
         return $fn($this->value);
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function or(Result $res): Result
     {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     #[Override]
     public function orElse(callable $fn): Result
     {

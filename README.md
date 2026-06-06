@@ -86,6 +86,30 @@ $result = (new Ok(2))
 echo $result->unwrapErr(); // "Too small"
 ```
 
+Each step in a chain may fail with a **different error type**. The error types
+are composed into a union, so PHPStan tracks every error the chain can produce:
+
+```php
+final class ValidationError {}
+final class NotFoundError {}
+
+/** @return Result<int, ValidationError> */
+function validateUserId(string $raw): Result
+{
+    return ctype_digit($raw) ? new Ok((int) $raw) : new Err(new ValidationError());
+}
+
+/** @return Result<string, NotFoundError> */
+function findUserNameById(int $id): Result
+{
+    return $id === 42 ? new Ok('Alice') : new Err(new NotFoundError());
+}
+
+// PHPStan infers Result<string, ValidationError|NotFoundError>
+$userName = validateUserId('42')->andThen(findUserNameById(...));
+echo $userName->unwrap(); // "Alice"
+```
+
 ### Combining Results
 
 ```php
@@ -113,6 +137,35 @@ $result = (new Ok(42))
 $result = (new Err("oops"))
     ->inspectErr(fn($e) => error_log("Error occurred: $e"));
 ```
+
+## Type Safety
+
+This library is designed to be used with [PHPStan](https://phpstan.org/) at level max
+and leans on several of its generics features:
+
+- **Sealed interface** — `Result` is annotated with `@phpstan-sealed Ok|Err`, so
+  PHPStan knows `Ok` and `Err` are the only implementations. A `match (true)` over
+  `instanceof` checks is recognized as exhaustive, and the `else` branch of an
+  `instanceof Ok` check narrows to `Err`.
+- **Covariant type parameters** — `T` and `E` are declared `@template-covariant`,
+  so `Ok<T>` (which is `Result<T, never>`) and `Err<E>` (which is `Result<never, E>`)
+  are assignable to any `Result<T, E>`. A function declared to return
+  `Result<User, DbError>` can simply `return new Ok($user);`.
+- **Error-type composition** — `andThen()`/`and()` widen the error channel to
+  `E|F` and `orElse()`/`or()` widen the success channel to `T|U`, so chains that
+  mix failure types stay precisely typed. (This deliberately diverges from Rust,
+  whose `and`/`or` family keeps the other channel's type fixed.)
+- **Type narrowing** — `isOk()`/`isErr()` narrow `$result` to `Ok<T>`/`Err<E>`
+  via `@phpstan-assert-if-true`; `unwrap()`/`unwrapErr()` use conditional return
+  types (`never` on the impossible side), and `unwrapOr()`/`unwrapOrElse()`
+  resolve to `T` on `Ok` and to the default's type on `Err`.
+- **Precise concrete receivers** — when the receiver is statically `Ok<T>` or
+  `Err<E>`, no-op methods keep their exact type (`$ok->orElse(...)` stays
+  `Ok<T>`, `$err->andThen(...)` stays `Err<E>`) instead of widening to a union.
+
+Note: because the templates are covariant, PHPStan preserves constant value types
+(`new Ok(10)` is `Ok<10>`, not `Ok<int>`). Type a variable or parameter as `int`
+if you want the widened type.
 
 ## API Reference
 
