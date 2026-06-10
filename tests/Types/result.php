@@ -95,6 +95,36 @@ function testIsOkNarrowing(Result $result): void
 }
 
 /**
+ * isErr によるナローイング: true 側で Err、false 側で Ok に絞り込まれる.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testIsErrNarrowing(Result $result): void
+{
+    if ($result->isErr()) {
+        assertType('Valbeat\Result\Err<RuntimeException>', $result);
+        assertType('RuntimeException', $result->unwrapErr());
+    } else {
+        assertType('Valbeat\Result\Ok<int>', $result);
+        assertType('int', $result->unwrap());
+    }
+}
+
+/**
+ * 既知の制限: instanceof Ok の true 側分岐ではジェネリクスが失われ、unwrap は mixed になる.
+ * 型引数を保ったまま絞り込みたい場合は isOk() / isErr() を使う（testIsOkNarrowing 参照）.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testInstanceofOkNarrowing(Result $result): void
+{
+    if ($result instanceof Ok) {
+        assertType('Valbeat\Result\Ok', $result);
+        assertType('mixed', $result->unwrap());
+    }
+}
+
+/**
  * sealed のテスト: instanceof Ok の else 分岐で Err に絞り込まれる.
  *
  * @param Result<int, RuntimeException> $result
@@ -121,6 +151,123 @@ function testExhaustiveMatch(Result $result): string
         $result instanceof Ok => 'ok',
         $result instanceof Err => 'err',
     };
+}
+
+/**
+ * 既知の制限: match 式の instanceof アームではジェネリクスが失われ mixed になる.
+ * 型引数を保ちたい場合は isOk() アームを使う（testMatchArmNarrowingWithIsOk 参照）.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testMatchArmNarrowing(Result $result): void
+{
+    $value = match (true) {
+        $result instanceof Ok => $result->unwrap(),
+        $result instanceof Err => $result->unwrapErr(),
+    };
+    assertType('mixed', $value);
+}
+
+/**
+ * match 式のアーム内ナローイング: isOk() でも assert-if-true が効く.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testMatchArmNarrowingWithIsOk(Result $result): void
+{
+    $value = match (true) {
+        $result->isOk() => $result->unwrap(),
+        default => $result->unwrapErr(),
+    };
+    assertType('int|RuntimeException', $value);
+}
+
+/**
+ * match() メソッドの戻り値は両コールバックの戻り値型 U|V に合成される.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testMatchMethodComposesReturnTypes(Result $result, float $fallback): void
+{
+    $value = $result->match(
+        stringify(...),
+        static fn (RuntimeException $e): float => $fallback,
+    );
+    assertType('float|string', $value);
+}
+
+/**
+ * inspect / inspectErr は型を変えない.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testInspectPreservesType(Result $result): void
+{
+    assertType('Valbeat\Result\Result<int, RuntimeException>', $result->inspect(static function (int $v): void {
+    }));
+    assertType('Valbeat\Result\Result<int, RuntimeException>', $result->inspectErr(static function (RuntimeException $e): void {
+    }));
+}
+
+/**
+ * isOkAnd / isErrAnd / inspect のコールバック引数の型が推論される.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testCallbackParamInference(Result $result): void
+{
+    $result->isOkAnd(static function ($value): bool {
+        assertType('int', $value);
+
+        return true;
+    });
+    $result->isErrAnd(static function ($error): bool {
+        assertType('RuntimeException', $error);
+
+        return true;
+    });
+    $result->inspect(static function ($value): void {
+        assertType('int', $value);
+    });
+    $result->inspectErr(static function ($error): void {
+        assertType('RuntimeException', $error);
+    });
+}
+
+/**
+ * コンストラクタからの型推論: new Ok / new Err で型引数が決まる.
+ */
+function testConstructorInference(int $value, RuntimeException $error): void
+{
+    assertType('Valbeat\Result\Ok<int>', new Ok($value));
+    assertType('Valbeat\Result\Err<RuntimeException>', new Err($error));
+}
+
+/**
+ * ジェネリック Result レシーバでの unwrap / unwrapErr は条件付き戻り値型が解決される.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testUnwrapOnGenericReceiver(Result $result): void
+{
+    assertType('int', $result->unwrap());
+    assertType('RuntimeException', $result->unwrapErr());
+}
+
+/**
+ * 具象レシーバでの unwrapOr / unwrapOrElse: 実行時に起こり得ない側の型を混ぜない.
+ *
+ * @param Ok<int> $ok
+ * @param Err<RuntimeException> $err
+ */
+function testConcreteUnwrapVariants(Ok $ok, Err $err, string $default, float $fallback): void
+{
+    assertType('int', $ok->unwrap());
+    assertType('int', $ok->unwrapOr($default));
+    assertType('int', $ok->unwrapOrElse(static fn (never $e): float => $fallback));
+    assertType('RuntimeException', $err->unwrapErr());
+    assertType('string', $err->unwrapOr($default));
+    assertType('float', $err->unwrapOrElse(static fn (RuntimeException $e): float => $fallback));
 }
 
 /**
