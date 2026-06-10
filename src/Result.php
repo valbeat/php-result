@@ -7,6 +7,10 @@ namespace Valbeat\Result;
 /**
  * Result型は、成功（Ok）または失敗（Err）を表現します。
  *
+ * 注意: instanceof による絞り込みでは型引数が失われます（PHPStan の既知の制限。
+ * Result<int, E> が型引数なしの Ok になり unwrap() は mixed になる）。
+ * 値を取り出す分岐では isOk() / isErr() で絞り込んでください。
+ *
  * @template-covariant T 成功時の値の型
  * @template-covariant E 失敗時のエラーの型
  *
