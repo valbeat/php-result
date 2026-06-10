@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.4']
+        php: ['8.4', '8.5']
 
     steps:
       - name: Checkout
@@ -50,6 +50,7 @@ jobs:
             --colors=always
 
       - name: Upload coverage to Codecov
+        if: matrix.php == '8.5'
         uses: codecov/codecov-action@v5
         with:
           files: build/logs/clover.xml
@@ -58,7 +59,7 @@ jobs:
           verbose: true
 
       - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.php == '8.5' }}
         uses: codecov/test-results-action@v1
         with:
           files: build/logs/junit.xml
