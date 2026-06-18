@@ -385,9 +385,10 @@ final class NetworkFailure implements AppError
 function testEnumErrorExhaustiveness(Result $result): string
 {
     if ($result->isErr()) {
-        assertType('Valbeat\Result\Tests\Types\HttpError', $result->unwrapErr());
+        $error = $result->unwrapErr();
+        assertType('Valbeat\Result\Tests\Types\HttpError', $error);
 
-        return match ($result->unwrapErr()) {
+        return match ($error) {
             HttpError::NotFound => 'not found',
             HttpError::Forbidden => 'forbidden',
         };
