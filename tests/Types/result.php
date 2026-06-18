@@ -418,12 +418,25 @@ function testSealedErrorExhaustiveness(Result $result): string
 }
 
 /**
- * 既知の落とし穴のピン留め: instanceof Err では E が失われ、enum/sealed であっても
- * unwrapErr() は mixed になる。値を扱う分岐は isErr() を使う（上の2ケース参照）.
+ * 既知の落とし穴のピン留め（enum エラー）: instanceof Err では E が失われ、
+ * enum であっても unwrapErr() は mixed になる。値を扱う分岐は isErr() を使う（上の2ケース参照）.
  *
  * @param Result<int, HttpError> $result
  */
-function testInstanceofErrLosesErrorType(Result $result): void
+function testInstanceofErrLosesEnumErrorType(Result $result): void
+{
+    if ($result instanceof Err) {
+        assertType('mixed', $result->unwrapErr());
+    }
+}
+
+/**
+ * 既知の落とし穴のピン留め（sealed エラー）: sealed union でも instanceof Err では
+ * E が失われ unwrapErr() は mixed になる.
+ *
+ * @param Result<int, AppError> $result
+ */
+function testInstanceofErrLosesSealedErrorType(Result $result): void
 {
     if ($result instanceof Err) {
         assertType('mixed', $result->unwrapErr());
