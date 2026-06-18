@@ -172,6 +172,15 @@ and leans on several of its generics features:
   via `@phpstan-assert-if-true`; `unwrap()`/`unwrapErr()` use conditional return
   types (`never` on the impossible side), and `unwrapOr()`/`unwrapOrElse()`
   resolve to `T` on `Ok` and to the default's type on `Err`.
+- **Exhaustive error matching** — when the error type `E` is a native `enum` or a
+  `@phpstan-sealed` union, the error value can be matched exhaustively (over the
+  enum cases, or `instanceof` arms for a sealed union) and PHPStan enforces it — a
+  missing case becomes an analysis error. Reach the error through `isErr()` +
+  `unwrapErr()`, or the `match()` method's `err` arm; narrowing with
+  `instanceof Err` drops `E` to `mixed` and loses the enum/sealed type (the same
+  `instanceof` limitation as above). As long as the error classes are themselves
+  non-generic, their own `instanceof` checks have no type arguments to lose
+  (unlike the generic `Ok`/`Err`).
 - **Precise concrete receivers** — when the receiver is statically `Ok<T>` or
   `Err<E>`, no-op methods keep their exact type (`$ok->orElse(...)` stays
   `Ok<T>`, `$err->andThen(...)` stays `Err<E>`) instead of widening to a union.
