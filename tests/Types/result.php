@@ -348,3 +348,84 @@ function testMap(Result $result): void
         $result->mapErr(static fn (RuntimeException $e): LogicException => new LogicException($e->getMessage())),
     );
 }
+
+/**
+ * エラー側の網羅性テスト用フィクスチャ: native enum.
+ */
+enum HttpError
+{
+    case NotFound;
+    case Forbidden;
+}
+
+/**
+ * エラー側の網羅性テスト用フィクスチャ: @phpstan-sealed なエラー union.
+ *
+ * @phpstan-sealed ValidationFailure|NetworkFailure
+ */
+interface AppError
+{
+}
+
+final class ValidationFailure implements AppError
+{
+}
+
+final class NetworkFailure implements AppError
+{
+}
+
+/**
+ * エラー型が native enum の場合: isErr() 経由なら unwrapErr() が enum 型を保ち、
+ * 全ケースを網羅する match は default なしで網羅と認識される.
+ * （いずれかのケースを落とすと phpstan analyse がエラーになるため、これ自体が網羅性のピン留めになる）
+ *
+ * @param Result<int, HttpError> $result
+ */
+function testEnumErrorExhaustiveness(Result $result): string
+{
+    if ($result->isErr()) {
+        assertType('Valbeat\Result\Tests\Types\HttpError', $result->unwrapErr());
+
+        return match ($result->unwrapErr()) {
+            HttpError::NotFound => 'not found',
+            HttpError::Forbidden => 'forbidden',
+        };
+    }
+
+    return 'ok';
+}
+
+/**
+ * エラー型が @phpstan-sealed union の場合: isErr() 経由で取り出した値に対する
+ * match(true)+instanceof が網羅と認識される（sealed 指定が前提。エラークラスは非ジェネリックなので型引数喪失は起きない）.
+ *
+ * @param Result<int, AppError> $result
+ */
+function testSealedErrorExhaustiveness(Result $result): string
+{
+    if ($result->isErr()) {
+        $error = $result->unwrapErr();
+        assertType('Valbeat\Result\Tests\Types\AppError', $error);
+
+        return match (true) {
+            $error instanceof ValidationFailure => 'validation',
+            $error instanceof NetworkFailure => 'network',
+        };
+    }
+
+    return 'ok';
+}
+
+/**
+ * 既知の落とし穴のピン留め: instanceof Err では E が失われ、enum/sealed であっても
+ * unwrapErr() は mixed になる。値を扱う分岐は isErr() を使う（上の2ケース参照）.
+ *
+ * @param Result<int, HttpError> $result
+ */
+function testInstanceofErrLosesErrorType(Result $result): void
+{
+    if ($result instanceof Err) {
+        assertType('mixed', $result->unwrapErr());
+    }
+}
