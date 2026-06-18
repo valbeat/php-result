@@ -148,8 +148,12 @@ and leans on several of its generics features:
   `instanceof` checks is recognized as exhaustive, and the `else` branch of an
   `instanceof Ok` check narrows to `Err`. Note that `instanceof` narrowing loses
   the type arguments (a known PHPStan limitation: `Result<int, E>` narrows to
-  plain `Ok`, so `unwrap()` becomes `mixed`) — use `instanceof` for exhaustiveness
-  checks only, and narrow with `isOk()`/`isErr()` when you need the values.
+  plain `Ok`, so `unwrap()` becomes `mixed`), so use `instanceof` in a
+  `match (true)` purely for exhaustiveness. When you also need the values, prefer
+  the `match()` method — it is exhaustive by construction (both arms are required)
+  and keeps `T`/`E` — or narrow with `isOk()`/`isErr()`. (`isOk()`/`isErr()` arms
+  inside a `match (true)` keep the type arguments but are *not* recognized as
+  exhaustive, so they require a `default` arm.)
 - **Covariant type parameters** — `T` and `E` are declared `@template-covariant`,
   so `Ok<T>` (which is `Result<T, never>`) and `Err<E>` (which is `Result<never, E>`)
   are assignable to any `Result<T, E>`. A function declared to return
