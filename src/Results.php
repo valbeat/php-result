@@ -9,6 +9,11 @@ namespace Valbeat\Result;
  */
 final class Results
 {
+    /**
+     * 静的ヘルパーのためインスタンス化を禁止します.
+     *
+     * @codeCoverageIgnore
+     */
     private function __construct()
     {
     }
