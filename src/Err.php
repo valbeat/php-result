@@ -147,15 +147,15 @@ final readonly class Err implements Result
      * @template U
      * @template V
      *
-     * @param callable(): U $default_fn
+     * @param callable(): U $defaultFn
      * @param callable(never): V $fn
      *
      * @return U
      */
     #[Override]
-    public function mapOrElse(callable $default_fn, callable $fn): mixed
+    public function mapOrElse(callable $defaultFn, callable $fn): mixed
     {
-        return $default_fn();
+        return $defaultFn();
     }
 
     /**
@@ -189,8 +189,8 @@ final readonly class Err implements Result
     }
 
     #[Override]
-    public function match(callable $ok_fn, callable $err_fn): mixed
+    public function match(callable $ok, callable $err): mixed
     {
-        return $err_fn($this->value);
+        return $err($this->value);
     }
 }

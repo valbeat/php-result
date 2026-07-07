@@ -146,12 +146,12 @@ interface Result
      *
      * @template U
      *
-     * @param callable(): U $default_fn
+     * @param callable(): U $defaultFn
      * @param callable(T): U $fn
      *
      * @return U
      */
-    public function mapOrElse(callable $default_fn, callable $fn): mixed;
+    public function mapOrElse(callable $defaultFn, callable $fn): mixed;
 
     /**
      * 成功の場合は第2の結果を返し、失敗の場合は最初のエラーを返します.
@@ -206,15 +206,15 @@ interface Result
     public function orElse(callable $fn): self;
 
     /**
-     * 成功の場合はok_fnを、失敗の場合はerr_fnを適用します.
+     * 成功の場合はokを、失敗の場合はerrを適用します.
      *
      * @template U
      * @template V
      *
-     * @param callable(T): U $ok_fn 成功値に適用する関数
-     * @param callable(E): V $err_fn エラー値に適用する関数
+     * @param callable(T): U $ok 成功値に適用する関数
+     * @param callable(E): V $err エラー値に適用する関数
      *
      * @return U|V 適用された関数の結果
      */
-    public function match(callable $ok_fn, callable $err_fn): mixed;
+    public function match(callable $ok, callable $err): mixed;
 }

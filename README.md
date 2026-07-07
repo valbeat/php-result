@@ -224,7 +224,7 @@ All Result types (both Ok and Err) implement these methods:
 - `inspectErr(callable $fn): Result` - Calls a function with the error value if Err
 
 #### Pattern Matching
-- `match(callable $okFn, callable $errFn): mixed` - Pattern match on the Result
+- `match(callable $ok, callable $err): mixed` - Pattern match on the Result
 
 ## License
 
