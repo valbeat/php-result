@@ -268,6 +268,25 @@ class OkTest extends TestCase
     }
 
     #[Test]
+    public function match_supportsNamedArguments(): void
+    {
+        $ok = new Ok(42);
+        $result = $ok->match(
+            ok: fn ($value) => "Success: $value",
+            err: fn ($error) => "Error: $error",
+        );
+        $this->assertSame('Success: 42', $result);
+    }
+
+    #[Test]
+    public function mapOrElse_supportsNamedArguments(): void
+    {
+        $ok = new Ok(10);
+        $result = $ok->mapOrElse(defaultFn: fn () => 100, fn: fn ($x) => $x * 2);
+        $this->assertSame(20, $result);
+    }
+
+    #[Test]
     public function ok_withNullValue_handles_null(): void
     {
         $ok = new Ok(null);

@@ -277,6 +277,25 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function match_supportsNamedArguments(): void
+    {
+        $err = new Err('error');
+        $result = $err->match(
+            ok: fn ($value) => "Success: $value",
+            err: fn ($error) => "Error: $error",
+        );
+        $this->assertSame('Error: error', $result);
+    }
+
+    #[Test]
+    public function mapOrElse_supportsNamedArguments(): void
+    {
+        $err = new Err('error');
+        $result = $err->mapOrElse(defaultFn: fn () => 100, fn: fn ($x) => $x * 2);
+        $this->assertSame(100, $result);
+    }
+
+    #[Test]
     public function err_withNullValue_handles_null(): void
     {
         $err = new Err(null);
