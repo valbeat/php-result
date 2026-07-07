@@ -65,7 +65,7 @@ final readonly class Err implements Result
     #[Override]
     public function expect(string $message): never
     {
-        throw new \LogicException($message);
+        throw UnwrapException::withMessage($message, $this->value);
     }
 
     /**

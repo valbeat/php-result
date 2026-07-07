@@ -36,6 +36,14 @@ final class UnwrapException extends \LogicException
     }
 
     /**
+     * expect() / expectErr() 用に、呼び出し側のメッセージと値の要約から例外を生成します.
+     */
+    public static function withMessage(string $message, mixed $value): self
+    {
+        return new self(\sprintf('%s: %s', $message, self::describe($value)));
+    }
+
+    /**
      * 例外メッセージ用に値の要約を生成します.
      *
      * 要約は単一行に正規化し、MAX_SUMMARY_LENGTH を超える部分は切り詰めます.

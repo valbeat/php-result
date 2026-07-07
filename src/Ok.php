@@ -74,7 +74,7 @@ final readonly class Ok implements Result
     #[Override]
     public function expectErr(string $message): never
     {
-        throw new \LogicException($message);
+        throw UnwrapException::withMessage($message, $this->value);
     }
 
     /**

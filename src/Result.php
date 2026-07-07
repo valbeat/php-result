@@ -77,18 +77,22 @@ interface Result
     /**
      * 成功値を返します。失敗の場合は指定したメッセージで例外を投げます.
      *
-     * @param string $message 失敗時の例外メッセージ
+     * @param string $message 失敗時の例外メッセージ（エラー値の要約が付加されます）
      *
      * @return ($this is Ok<mixed> ? T : never)
+     *
+     * @throws UnwrapException $this が Err の場合
      */
     public function expect(string $message): mixed;
 
     /**
      * エラー値を返します。成功の場合は指定したメッセージで例外を投げます.
      *
-     * @param string $message 成功時の例外メッセージ
+     * @param string $message 成功時の例外メッセージ（成功値の要約が付加されます）
      *
      * @return ($this is Err<mixed> ? E : never)
+     *
+     * @throws UnwrapException $this が Ok の場合
      */
     public function expectErr(string $message): mixed;
 
