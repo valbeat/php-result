@@ -59,7 +59,7 @@ final readonly class Ok implements Result
     #[Override]
     public function unwrapErr(): never
     {
-        throw new \LogicException('called Result::unwrapErr() on an Ok value');
+        throw UnwrapException::unwrapErrOnOk($this->value);
     }
 
     /**

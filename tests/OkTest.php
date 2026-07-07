@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
+use Valbeat\Result\UnwrapException;
 
 class OkTest extends TestCase
 {
@@ -103,6 +104,30 @@ class OkTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('should have an error');
         $ok->expectErr('should have an error');
+    }
+
+    #[Test]
+    public function unwrapErr_throwsUnwrapException_withValueInMessage(): void
+    {
+        $ok = new Ok(42);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('called Result::unwrapErr() on an Ok value: 42');
+        $ok->unwrapErr();
+    }
+
+    #[Test]
+    public function unwrapErr_withStringableValue_includesClassAndString(): void
+    {
+        $value = new class () implements \Stringable {
+            public function __toString(): string
+            {
+                return 'stringable value';
+            }
+        };
+        $ok = new Ok($value);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('stringable value');
+        $ok->unwrapErr();
     }
 
     #[Test]
