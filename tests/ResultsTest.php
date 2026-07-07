@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
+use Valbeat\Result\Result;
 use Valbeat\Result\Results;
 
 class ResultsTest extends TestCase
@@ -58,7 +59,9 @@ class ResultsTest extends TestCase
     #[Test]
     public function combine_withEmptyIterable_returns_ok_with_empty_array(): void
     {
-        $result = Results::combine([]);
+        /** @var list<Result<int, string>> $results */
+        $results = [];
+        $result = Results::combine($results);
         $this->assertInstanceOf(Ok::class, $result);
         $this->assertSame([], $result->unwrap());
     }
@@ -94,8 +97,20 @@ class ResultsTest extends TestCase
     #[Test]
     public function flatten_err_returns_outer_err(): void
     {
-        $outer = new Err('outer error');
+        $outer = self::asNestedResult(new Err('outer error'));
         $result = Results::flatten($outer);
         $this->assertSame($outer, $result);
+    }
+
+    /**
+     * リテラル型を Result<Result<int, string>, string> に widening するためのヘルパ.
+     *
+     * @param Result<Result<int, string>, string> $result
+     *
+     * @return Result<Result<int, string>, string>
+     */
+    private static function asNestedResult(Result $result): Result
+    {
+        return $result;
     }
 }
