@@ -30,8 +30,8 @@ $failure = new Err("Something went wrong");
 
 // Pattern matching with the match() method
 $message = $success->match(
-    fn($value) => "Success: $value",
-    fn($error) => "Error: $error"
+    ok: fn($value) => "Success: $value",
+    err: fn($error) => "Error: $error"
 );
 echo $message; // "Success: 42"
 
