@@ -146,13 +146,13 @@ final readonly class Ok implements Result
      * @template U
      * @template V
      *
-     * @param callable(): V $default_fn
+     * @param callable(): V $defaultFn
      * @param callable(T): U $fn
      *
      * @return U
      */
     #[Override]
-    public function mapOrElse(callable $default_fn, callable $fn): mixed
+    public function mapOrElse(callable $defaultFn, callable $fn): mixed
     {
         return $fn($this->value);
     }
@@ -188,8 +188,8 @@ final readonly class Ok implements Result
     }
 
     #[Override]
-    public function match(callable $ok_fn, callable $err_fn): mixed
+    public function match(callable $ok, callable $err): mixed
     {
-        return $ok_fn($this->value);
+        return $ok($this->value);
     }
 }
