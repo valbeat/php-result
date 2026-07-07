@@ -255,6 +255,17 @@ function testUnwrapOnGenericReceiver(Result $result): void
 }
 
 /**
+ * expect / expectErr も unwrap / unwrapErr と同じ条件付き戻り値型が解決される.
+ *
+ * @param Result<int, RuntimeException> $result
+ */
+function testExpectOnGenericReceiver(Result $result): void
+{
+    assertType('int', $result->expect('should have a value'));
+    assertType('RuntimeException', $result->expectErr('should have an error'));
+}
+
+/**
  * 具象レシーバでの unwrapOr / unwrapOrElse: 実行時に起こり得ない側の型を混ぜない.
  *
  * @param Ok<int> $ok

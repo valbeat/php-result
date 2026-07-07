@@ -59,6 +59,22 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function expect_throws_withGivenMessage(): void
+    {
+        $err = new Err('error');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('config file should be readable');
+        $err->expect('config file should be readable');
+    }
+
+    #[Test]
+    public function expectErr_returns_error_value(): void
+    {
+        $err = new Err('error');
+        $this->assertSame('error', $err->expectErr('should have an error'));
+    }
+
+    #[Test]
     public function unwrapErr_returns_error_value(): void
     {
         $err = new Err('error message');

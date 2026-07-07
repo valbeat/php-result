@@ -90,6 +90,22 @@ class OkTest extends TestCase
     }
 
     #[Test]
+    public function expect_returns_value(): void
+    {
+        $ok = new Ok(42);
+        $this->assertSame(42, $ok->expect('should have a value'));
+    }
+
+    #[Test]
+    public function expectErr_throws_withGivenMessage(): void
+    {
+        $ok = new Ok(42);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('should have an error');
+        $ok->expectErr('should have an error');
+    }
+
+    #[Test]
     public function unwrapOr_returns_value(): void
     {
         $ok = new Ok(42);
