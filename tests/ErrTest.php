@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
+use Valbeat\Result\UnwrapException;
 
 class ErrTest extends TestCase
 {
@@ -56,6 +57,46 @@ class ErrTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('called Result::unwrap() on an Err value');
         $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_throwsUnwrapException_withErrorValueInMessage(): void
+    {
+        $err = new Err('error');
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage("called Result::unwrap() on an Err value: 'error'");
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withThrowableError_includesClassAndMessage(): void
+    {
+        $err = new Err(new \RuntimeException('boom'));
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('called Result::unwrap() on an Err value: RuntimeException: boom');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withArrayError_describesType(): void
+    {
+        $err = new Err(['code' => 500]);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('called Result::unwrap() on an Err value: array');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrapException_remainsCatchableAsLogicException(): void
+    {
+        $err = new Err('error');
+
+        try {
+            $err->unwrap();
+            $this->fail('expected an exception');
+        } catch (\LogicException $e) {
+            $this->assertInstanceOf(UnwrapException::class, $e);
+        }
     }
 
     #[Test]
