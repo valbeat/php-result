@@ -63,6 +63,21 @@ final readonly class Ok implements Result
     }
 
     /**
+     * @return T
+     */
+    #[Override]
+    public function expect(string $message): mixed
+    {
+        return $this->value;
+    }
+
+    #[Override]
+    public function expectErr(string $message): never
+    {
+        throw new \LogicException($message);
+    }
+
+    /**
      * @template U
      * @param U $default
      * @return T

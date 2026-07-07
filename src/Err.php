@@ -62,6 +62,21 @@ final readonly class Err implements Result
         return $this->value;
     }
 
+    #[Override]
+    public function expect(string $message): never
+    {
+        throw new \LogicException($message);
+    }
+
+    /**
+     * @return E
+     */
+    #[Override]
+    public function expectErr(string $message): mixed
+    {
+        return $this->value;
+    }
+
     /**
      * @template U
      * @param U $default
