@@ -137,6 +137,23 @@ $result = (new Err("oops"))
     ->inspectErr(fn($e) => error_log("Error occurred: $e"));
 ```
 
+### Helpers (Results class)
+
+```php
+use Valbeat\Result\Results;
+
+// Wrap exception-throwing code: Ok on success, Err<Throwable> on throw
+$result = Results::try(fn() => json_decode($raw, flags: JSON_THROW_ON_ERROR));
+
+// Combine many Results: Ok with all values, or the first Err
+$result = Results::combine([new Ok(1), new Ok(2), new Ok(3)]);
+echo implode(',', $result->unwrap()); // "1,2,3"
+
+// Flatten a nested Result<Result<T, E2>, E1> into Result<T, E1|E2>
+$result = Results::flatten(new Ok(new Ok(42)));
+echo $result->unwrap(); // 42
+```
+
 ## Type Safety
 
 This library is designed to be used with [PHPStan](https://phpstan.org/) at level max
@@ -226,6 +243,11 @@ All Result types (both Ok and Err) implement these methods:
 
 #### Pattern Matching
 - `match(callable $ok, callable $err): mixed` - Pattern match on the Result
+
+### Results Helpers (static)
+- `Results::try(callable $fn): Result` - Runs a callable and wraps the outcome: Ok with the return value, or Err with the thrown Throwable
+- `Results::combine(iterable $results): Result` - Combines `iterable<Result<T, E>>` into `Result<list<T>, E>`, short-circuiting on the first Err
+- `Results::flatten(Result $result): Result` - Flattens `Result<Result<T, E2>, E1>` into `Result<T, E1|E2>`
 
 ## License
 
