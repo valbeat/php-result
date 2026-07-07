@@ -47,7 +47,7 @@ if ($failure->isErr()) {
 
 // Unwrapping values (throws exception on error)
 $value = $success->unwrap(); // 42
-// $failure->unwrap(); // throws LogicException
+// $failure->unwrap(); // throws UnwrapException
 
 // Safe unwrapping with default values
 $value = $failure->unwrapOr(0); // 0
@@ -202,8 +202,8 @@ All Result types (both Ok and Err) implement these methods:
 - `isErrAnd(callable $fn): bool` - Returns true if the Result is Err and the predicate returns true
 
 #### Value Extraction
-- `unwrap(): mixed` - Returns the success value or throws LogicException
-- `unwrapErr(): mixed` - Returns the error value or throws LogicException
+- `unwrap(): mixed` - Returns the success value or throws UnwrapException (extends LogicException)
+- `unwrapErr(): mixed` - Returns the error value or throws UnwrapException (extends LogicException)
 - `unwrapOr(mixed $default): mixed` - Returns the success value or a default
 - `unwrapOrElse(callable $fn): mixed` - Returns the success value or computes it from the error
 

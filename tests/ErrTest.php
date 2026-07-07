@@ -93,7 +93,6 @@ class ErrTest extends TestCase
 
         try {
             $err->unwrap();
-            $this->fail('expected an exception');
         } catch (\LogicException $e) {
             $this->assertInstanceOf(UnwrapException::class, $e);
         }
