@@ -15,7 +15,7 @@ composer require valbeat/result
 
 ## Requirements
 
-- PHP 8.4 or higher (tested on PHP 8.4 and 8.5)
+- PHP 8.3 or higher (tested on PHP 8.3, 8.4 and 8.5)
 - Composer
 
 ## Basic Usage

@@ -13,7 +13,7 @@ parameters:
     checkBenevolentUnionTypes: true
     checkUninitializedProperties: true
     
-    # Supported PHP versions (8.4 - 8.5)
+    # Supported PHP versions (8.3 - 8.5)
     phpVersion:
-        min: 80400
+        min: 80300
         max: 80500
