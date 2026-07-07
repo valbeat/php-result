@@ -5,7 +5,7 @@
 
 A Result type implementation for PHP inspired by Rust's `Result<T, E>` type.
 
-This library provides a robust way to handle operations that might fail, without relying on exceptions. It encourages explicit error handling and makes it impossible to accidentally ignore errors.
+This library provides a robust way to handle operations that might fail, without relying on exceptions. It encourages explicit error handling by making the error case part of the return type, so failures are visible in function signatures instead of being hidden control flow.
 
 ## Installation
 
@@ -23,13 +23,12 @@ composer require valbeat/result
 ```php
 use Valbeat\Result\Ok;
 use Valbeat\Result\Err;
-use Valbeat\Result\Result;
 
 // Creating Results
 $success = new Ok(42);
 $failure = new Err("Something went wrong");
 
-// Pattern matching with match expression
+// Pattern matching with the match() method
 $message = $success->match(
     ok: fn($value) => "Success: $value",
     err: fn($error) => "Error: $error"
@@ -51,7 +50,7 @@ $value = $success->unwrap(); // 42
 
 // Safe unwrapping with default values
 $value = $failure->unwrapOr(0); // 0
-$value = $failure->unwrapOrElse(fn($err) => strlen($err)); // 19
+$value = $failure->unwrapOrElse(fn($err) => strlen($err)); // 20
 ```
 
 ## Advanced Usage
