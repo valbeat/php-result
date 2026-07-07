@@ -99,6 +99,54 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function unwrap_withThrowingStringableError_stillThrowsUnwrapException(): void
+    {
+        $stringable = new class implements \Stringable {
+            public function __toString(): string
+            {
+                throw new \RuntimeException('rendering failed');
+            }
+        };
+        $err = new Err($stringable);
+        $this->expectException(UnwrapException::class);
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withEnumError_includesCaseName(): void
+    {
+        $err = new Err(SampleEnumError::NotFound);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('SampleEnumError::NotFound');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withLongStringError_truncatesMessage(): void
+    {
+        $err = new Err(str_repeat('a', 10000));
+
+        try {
+            $err->unwrap();
+        } catch (UnwrapException $e) {
+            $this->assertLessThan(300, \strlen($e->getMessage()));
+            $this->assertStringContainsString('(truncated)', $e->getMessage());
+        }
+    }
+
+    #[Test]
+    public function unwrap_withMultilineStringError_keepsMessageSingleLine(): void
+    {
+        $err = new Err("line1\nline2");
+
+        try {
+            $err->unwrap();
+        } catch (UnwrapException $e) {
+            $this->assertStringNotContainsString("\n", $e->getMessage());
+        }
+    }
+
+    #[Test]
     public function unwrapErr_returns_error_value(): void
     {
         $err = new Err('error message');
@@ -390,4 +438,12 @@ class ErrTest extends TestCase
     {
         return $value;
     }
+}
+
+/**
+ * UnwrapException のメッセージが enum のケース名を含むことを検証するためのフィクスチャ.
+ */
+enum SampleEnumError
+{
+    case NotFound;
 }
