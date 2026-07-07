@@ -11,10 +11,10 @@ $finder = PhpCsFixer\Finder::create()
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
-return new PhpCsFixer\Config()
+return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR12' => true,
-        '@PHP84Migration' => true,
+        '@PHP83Migration' => true,
         'array_syntax' => ['syntax' => 'short'],
         'blank_line_after_namespace' => true,
         'blank_line_after_opening_tag' => true,
