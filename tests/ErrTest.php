@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Valbeat\Result\Err;
 use Valbeat\Result\Ok;
+use Valbeat\Result\UnwrapException;
 
 class ErrTest extends TestCase
 {
@@ -56,6 +57,93 @@ class ErrTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('called Result::unwrap() on an Err value');
         $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_throwsUnwrapException_withErrorValueInMessage(): void
+    {
+        $err = new Err('error');
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage("called Result::unwrap() on an Err value: 'error'");
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withThrowableError_includesClassAndMessage(): void
+    {
+        $err = new Err(new \RuntimeException('boom'));
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('called Result::unwrap() on an Err value: RuntimeException: boom');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withArrayError_describesType(): void
+    {
+        $err = new Err(['code' => 500]);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('called Result::unwrap() on an Err value: array');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrapException_remainsCatchableAsLogicException(): void
+    {
+        $err = new Err('error');
+
+        try {
+            $err->unwrap();
+        } catch (\LogicException $e) {
+            $this->assertInstanceOf(UnwrapException::class, $e);
+        }
+    }
+
+    #[Test]
+    public function unwrap_withThrowingStringableError_stillThrowsUnwrapException(): void
+    {
+        $stringable = new class () implements \Stringable {
+            public function __toString(): string
+            {
+                throw new \RuntimeException('rendering failed');
+            }
+        };
+        $err = new Err($stringable);
+        $this->expectException(UnwrapException::class);
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withEnumError_includesCaseName(): void
+    {
+        $err = new Err(SampleEnumError::NotFound);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('SampleEnumError::NotFound');
+        $err->unwrap();
+    }
+
+    #[Test]
+    public function unwrap_withLongStringError_truncatesMessage(): void
+    {
+        $err = new Err(str_repeat('a', 10000));
+
+        try {
+            $err->unwrap();
+        } catch (UnwrapException $e) {
+            $this->assertLessThan(300, \strlen($e->getMessage()));
+            $this->assertStringContainsString('(truncated)', $e->getMessage());
+        }
+    }
+
+    #[Test]
+    public function unwrap_withMultilineStringError_keepsMessageSingleLine(): void
+    {
+        $err = new Err("line1\nline2");
+
+        try {
+            $err->unwrap();
+        } catch (UnwrapException $e) {
+            $this->assertStringNotContainsString("\n", $e->getMessage());
+        }
     }
 
     #[Test]
@@ -369,4 +457,12 @@ class ErrTest extends TestCase
     {
         return $value;
     }
+}
+
+/**
+ * UnwrapException のメッセージが enum のケース名を含むことを検証するためのフィクスチャ.
+ */
+enum SampleEnumError
+{
+    case NotFound;
 }

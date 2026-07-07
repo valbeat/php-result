@@ -60,6 +60,8 @@ interface Result
      * 成功値を返します。失敗の場合は例外を投げます.
      *
      * @return ($this is Ok<mixed> ? T : never)
+     *
+     * @throws UnwrapException $this が Err の場合
      */
     public function unwrap(): mixed;
 
@@ -67,6 +69,8 @@ interface Result
      * エラー値を返します。成功の場合は例外を投げます.
      *
      * @return ($this is Err<mixed> ? E : never)
+     *
+     * @throws UnwrapException $this が Ok の場合
      */
     public function unwrapErr(): mixed;
 
