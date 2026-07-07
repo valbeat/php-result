@@ -203,6 +203,8 @@ All Result types (both Ok and Err) implement these methods:
 #### Value Extraction
 - `unwrap(): mixed` - Returns the success value or throws UnwrapException (extends LogicException)
 - `unwrapErr(): mixed` - Returns the error value or throws UnwrapException (extends LogicException)
+- `expect(string $message): mixed` - Returns the success value or throws UnwrapException with the given message and a summary of the error value
+- `expectErr(string $message): mixed` - Returns the error value or throws UnwrapException with the given message and a summary of the success value
 - `unwrapOr(mixed $default): mixed` - Returns the success value or a default
 - `unwrapOrElse(callable $fn): mixed` - Returns the success value or computes it from the error
 
