@@ -101,7 +101,7 @@ class ErrTest extends TestCase
     #[Test]
     public function unwrap_withThrowingStringableError_stillThrowsUnwrapException(): void
     {
-        $stringable = new class implements \Stringable {
+        $stringable = new class () implements \Stringable {
             public function __toString(): string
             {
                 throw new \RuntimeException('rendering failed');
