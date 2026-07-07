@@ -163,6 +163,15 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function expect_throwsUnwrapException_withErrorValueInMessage(): void
+    {
+        $err = new Err(new \RuntimeException('boom'));
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('config file should be readable: RuntimeException: boom');
+        $err->expect('config file should be readable');
+    }
+
+    #[Test]
     public function unwrapErr_returns_error_value(): void
     {
         $err = new Err('error message');

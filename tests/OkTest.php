@@ -131,6 +131,15 @@ class OkTest extends TestCase
     }
 
     #[Test]
+    public function expectErr_throwsUnwrapException_withValueInMessage(): void
+    {
+        $ok = new Ok(42);
+        $this->expectException(UnwrapException::class);
+        $this->expectExceptionMessage('should have an error: 42');
+        $ok->expectErr('should have an error');
+    }
+
+    #[Test]
     public function unwrapOr_returns_value(): void
     {
         $ok = new Ok(42);
