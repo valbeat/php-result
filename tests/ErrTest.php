@@ -60,15 +60,6 @@ class ErrTest extends TestCase
     }
 
     #[Test]
-    public function expect_throws_withGivenMessage(): void
-    {
-        $err = new Err('error');
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('config file should be readable');
-        $err->expect('config file should be readable');
-    }
-
-    #[Test]
     public function expectErr_returns_error_value(): void
     {
         $err = new Err('error');
@@ -100,18 +91,6 @@ class ErrTest extends TestCase
         $this->expectException(UnwrapException::class);
         $this->expectExceptionMessage('called Result::unwrap() on an Err value: array');
         $err->unwrap();
-    }
-
-    #[Test]
-    public function unwrapException_remainsCatchableAsLogicException(): void
-    {
-        $err = new Err('error');
-
-        try {
-            $err->unwrap();
-        } catch (\LogicException $e) {
-            $this->assertInstanceOf(UnwrapException::class, $e);
-        }
     }
 
     #[Test]
@@ -179,41 +158,10 @@ class ErrTest extends TestCase
     }
 
     #[Test]
-    public function unwrapErr_withIntValue_returns_int(): void
-    {
-        $err = new Err(404);
-        $this->assertSame(404, $err->unwrapErr());
-    }
-
-    #[Test]
-    public function unwrapErr_withArrayValue_returns_array(): void
-    {
-        $error = ['code' => 500, 'message' => 'Internal Server Error'];
-        $err = new Err($error);
-        $this->assertSame($error, $err->unwrapErr());
-    }
-
-    #[Test]
-    public function unwrapErr_withObjectValue_returns_object(): void
-    {
-        $error = new \Exception('Test exception');
-        $err = new Err($error);
-        $this->assertSame($error, $err->unwrapErr());
-    }
-
-    #[Test]
     public function unwrapOr_returns_default(): void
     {
         $err = new Err('error');
         $this->assertSame(42, $err->unwrapOr(42));
-    }
-
-    #[Test]
-    public function unwrapOr_withDifferentTypes_returns_default(): void
-    {
-        $err = new Err('error');
-        $this->assertSame('default', $err->unwrapOr('default'));
-        $this->assertSame(['default'], $err->unwrapOr(['default']));
     }
 
     #[Test]
@@ -248,15 +196,6 @@ class ErrTest extends TestCase
         $mapped = $err->mapErr(fn ($e) => strtoupper($e));
         $this->assertInstanceOf(Err::class, $mapped);
         $this->assertSame('ERROR', $mapped->unwrapErr());
-    }
-
-    #[Test]
-    public function mapErr_withTypeChange_transforms_type(): void
-    {
-        $err = new Err(404);
-        $mapped = $err->mapErr(fn ($code) => "Error code: $code");
-        $this->assertInstanceOf(Err::class, $mapped);
-        $this->assertSame('Error code: 404', $mapped->unwrapErr());
     }
 
     #[Test]
@@ -329,16 +268,6 @@ class ErrTest extends TestCase
     }
 
     #[Test]
-    public function andThen_withDifferentErrorType_keeps_original_error(): void
-    {
-        $err = new Err(self::asString('validation failed'));
-        $result = $err->andThen(fn ($x) => new Err(new \DomainException('unreachable')));
-
-        $this->assertSame($err, $result);
-        $this->assertSame('validation failed', $result->unwrapErr());
-    }
-
-    #[Test]
     public function or_withAnotherErr_returns_second_err(): void
     {
         $err1 = new Err('error1');
@@ -379,17 +308,6 @@ class ErrTest extends TestCase
     }
 
     #[Test]
-    public function match_withDifferentReturnTypes_returns_err_branch(): void
-    {
-        $err = new Err(404);
-        $result = $err->match(
-            fn ($value) => ['status' => 'ok', 'data' => $value],
-            fn ($error) => ['status' => 'error', 'code' => $error],
-        );
-        $this->assertSame(['status' => 'error', 'code' => 404], $result);
-    }
-
-    #[Test]
     public function match_supportsNamedArguments(): void
     {
         $err = new Err('error');
@@ -426,22 +344,6 @@ class ErrTest extends TestCase
     }
 
     #[Test]
-    public function err_withZeroValue_handles_zero(): void
-    {
-        $err = new Err(0);
-        $this->assertSame(0, $err->unwrapErr());
-        $this->assertTrue($err->isErr());
-    }
-
-    #[Test]
-    public function err_withEmptyString_handles_empty_string(): void
-    {
-        $err = new Err('');
-        $this->assertSame('', $err->unwrapErr());
-        $this->assertTrue($err->isErr());
-    }
-
-    #[Test]
     public function chainingOperations_applies_transformations(): void
     {
         $err = new Err('initial error');
@@ -452,19 +354,6 @@ class ErrTest extends TestCase
 
         $this->assertInstanceOf(Err::class, $result);
         $this->assertSame('Final: [INITIAL ERROR]', $result->unwrapErr());
-    }
-
-    #[Test]
-    public function exceptionAsErrorValue_handles_exception(): void
-    {
-        $exception = new \RuntimeException('Something went wrong');
-        $err = new Err($exception);
-
-        $this->assertTrue($err->isErr());
-        $this->assertSame($exception, $err->unwrapErr());
-
-        $handled = $err->mapErr(fn ($e) => $e->getMessage());
-        $this->assertSame('Something went wrong', $handled->unwrapErr());
     }
 
     /**

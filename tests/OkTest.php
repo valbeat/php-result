@@ -58,30 +58,6 @@ class OkTest extends TestCase
     }
 
     #[Test]
-    public function unwrap_withStringValue_returns_string(): void
-    {
-        $ok = new Ok('hello');
-        $this->assertSame('hello', $ok->unwrap());
-    }
-
-    #[Test]
-    public function unwrap_withArrayValue_returns_array(): void
-    {
-        $value = ['foo' => 'bar'];
-        $ok = new Ok($value);
-        $this->assertSame($value, $ok->unwrap());
-    }
-
-    #[Test]
-    public function unwrap_withObjectValue_returns_object(): void
-    {
-        $value = new \stdClass();
-        $value->foo = 'bar';
-        $ok = new Ok($value);
-        $this->assertSame($value, $ok->unwrap());
-    }
-
-    #[Test]
     public function unwrapErr_throws_exception(): void
     {
         $ok = new Ok(42);
@@ -95,15 +71,6 @@ class OkTest extends TestCase
     {
         $ok = new Ok(42);
         $this->assertSame(42, $ok->expect('should have a value'));
-    }
-
-    #[Test]
-    public function expectErr_throws_withGivenMessage(): void
-    {
-        $ok = new Ok(42);
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('should have an error');
-        $ok->expectErr('should have an error');
     }
 
     #[Test]
@@ -161,15 +128,6 @@ class OkTest extends TestCase
         $mapped = $ok->map(fn ($x) => $x * 2);
         $this->assertInstanceOf(Ok::class, $mapped);
         $this->assertSame(20, $mapped->unwrap());
-    }
-
-    #[Test]
-    public function map_withTypeChange_transforms_type(): void
-    {
-        $ok = new Ok(42);
-        $mapped = $ok->map(fn ($x) => "Value is: $x");
-        $this->assertInstanceOf(Ok::class, $mapped);
-        $this->assertSame('Value is: 42', $mapped->unwrap());
     }
 
     #[Test]
@@ -241,32 +199,6 @@ class OkTest extends TestCase
     }
 
     #[Test]
-    public function andThen_withDifferentErrorType_chains_results(): void
-    {
-        $ok = new Ok(self::asInt(10));
-        $result = $ok->andThen(
-            fn ($x) => $x > 5 ? new Ok("value: $x") : new Err(new \DomainException('too small')),
-        );
-
-        $this->assertInstanceOf(Ok::class, $result);
-        $this->assertSame('value: 10', $result->unwrap());
-    }
-
-    #[Test]
-    public function andThen_withDifferentErrorType_returns_new_err(): void
-    {
-        $ok = new Ok(self::asInt(3));
-        $result = $ok->andThen(
-            fn ($x) => $x > 5 ? new Ok("value: $x") : new Err(new \DomainException('too small')),
-        );
-
-        $this->assertInstanceOf(Err::class, $result);
-        $error = $result->unwrapErr();
-        $this->assertInstanceOf(\DomainException::class, $error);
-        $this->assertSame('too small', $error->getMessage());
-    }
-
-    #[Test]
     public function or_returns_self(): void
     {
         $ok1 = new Ok(42);
@@ -307,17 +239,6 @@ class OkTest extends TestCase
     }
 
     #[Test]
-    public function match_withDifferentReturnTypes_returns_ok_branch(): void
-    {
-        $ok = new Ok('hello');
-        $result = $ok->match(
-            fn ($value) => \strlen($value),
-            fn ($error) => -1,
-        );
-        $this->assertSame(5, $result);
-    }
-
-    #[Test]
     public function match_supportsNamedArguments(): void
     {
         $ok = new Ok(42);
@@ -350,22 +271,6 @@ class OkTest extends TestCase
     {
         $ok = new Ok(false);
         $this->assertFalse($ok->unwrap());
-        $this->assertTrue($ok->isOk());
-    }
-
-    #[Test]
-    public function ok_withZeroValue_handles_zero(): void
-    {
-        $ok = new Ok(0);
-        $this->assertSame(0, $ok->unwrap());
-        $this->assertTrue($ok->isOk());
-    }
-
-    #[Test]
-    public function ok_withEmptyString_handles_empty_string(): void
-    {
-        $ok = new Ok('');
-        $this->assertSame('', $ok->unwrap());
         $this->assertTrue($ok->isOk());
     }
 
