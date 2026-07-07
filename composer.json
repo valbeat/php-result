@@ -30,7 +30,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit --do-not-fail-on-warning || exit 0",
+        "test": "phpunit",
         "phpstan": "phpstan analyse",
         "cs-fix": "php-cs-fixer fix --verbose",
         "cs-check": "php-cs-fixer fix --verbose --dry-run",
