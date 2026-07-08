@@ -61,7 +61,9 @@ final class UnwrapException extends \LogicException
 
         $summary = str_replace(["\r\n", "\r", "\n"], '\n', $summary);
         if (\strlen($summary) > self::MAX_SUMMARY_LENGTH) {
-            return substr($summary, 0, self::MAX_SUMMARY_LENGTH) . '... (truncated)';
+            // バイト上限を守りつつ文字境界で切るため mb_strcut を使う（substr だと
+            // マルチバイト文字の途中で切れて不正な UTF-8 になり json_encode が失敗する）.
+            return mb_strcut($summary, 0, self::MAX_SUMMARY_LENGTH, 'UTF-8') . '... (truncated)';
         }
 
         return $summary;

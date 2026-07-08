@@ -142,6 +142,28 @@ class ErrTest extends TestCase
     }
 
     #[Test]
+    public function unwrap_withLongMultibyteError_keepsValidUtf8Message(): void
+    {
+        // 各文字 3 バイトなので、120 バイトの切り詰め境界が文字の途中に落ちる
+        $err = new Err(str_repeat('あ', 200));
+
+        try {
+            $err->unwrap();
+        } catch (UnwrapException $e) {
+            $message = $e->getMessage();
+            $this->assertTrue(
+                mb_check_encoding($message, 'UTF-8'),
+                'truncated message must remain valid UTF-8',
+            );
+            $this->assertNotFalse(
+                json_encode(['message' => $message]),
+                'message must be json_encode-able (no malformed UTF-8)',
+            );
+            $this->assertStringContainsString('(truncated)', $message);
+        }
+    }
+
+    #[Test]
     public function expect_throwsUnwrapException_withErrorValueInMessage(): void
     {
         $err = new Err(new \RuntimeException('boom'));
