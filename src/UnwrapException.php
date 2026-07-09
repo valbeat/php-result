@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Valbeat\Result;
 
 /**
- * unwrap() / unwrapErr() を反対側の変種に対して呼び出したときに送出される例外です.
+ * The exception thrown when unwrap() / unwrapErr() is called on the opposite variant.
  *
- * \LogicException を継承しているため、既存の catch (\LogicException) はそのまま動作します.
- * メッセージには保持している値の要約が含まれます（Rust の panic メッセージに相当）.
- * 注意: スカラー値はメッセージにそのまま（切り詰めの上）現れるため、機微な文字列を
- * エラー値に載せる場合はログ出力先に注意してください.
+ * It extends \LogicException, so existing catch (\LogicException) blocks keep working.
+ * The message contains a summary of the held value (analogous to Rust's panic message).
+ * Note: scalar values appear in the message verbatim (after truncation), so be careful
+ * about where you log if you put sensitive strings in the error value.
  */
 final class UnwrapException extends \LogicException
 {
     /**
-     * メッセージに埋め込む値要約の最大長（超過分は切り詰め）.
+     * The maximum length of the value summary embedded in the message (excess is truncated).
      */
     private const int MAX_SUMMARY_LENGTH = 120;
 
     /**
-     * Err に対して unwrap() が呼ばれた場合の例外を生成します.
+     * Creates the exception for when unwrap() is called on an Err.
      */
     public static function unwrapOnErr(mixed $error): self
     {
@@ -28,7 +28,7 @@ final class UnwrapException extends \LogicException
     }
 
     /**
-     * Ok に対して unwrapErr() が呼ばれた場合の例外を生成します.
+     * Creates the exception for when unwrapErr() is called on an Ok.
      */
     public static function unwrapErrOnOk(mixed $value): self
     {
@@ -36,7 +36,7 @@ final class UnwrapException extends \LogicException
     }
 
     /**
-     * expect() / expectErr() 用に、呼び出し側のメッセージと値の要約から例外を生成します.
+     * Creates the exception for expect() / expectErr() from the caller's message and a value summary.
      */
     public static function withMessage(string $message, mixed $value): self
     {
@@ -44,9 +44,9 @@ final class UnwrapException extends \LogicException
     }
 
     /**
-     * 例外メッセージ用に値の要約を生成します.
+     * Builds a value summary for the exception message.
      *
-     * 要約は単一行に正規化し、MAX_SUMMARY_LENGTH を超える部分は切り詰めます.
+     * The summary is normalized to a single line and truncated beyond MAX_SUMMARY_LENGTH.
      */
     private static function describe(mixed $value): string
     {
@@ -61,8 +61,9 @@ final class UnwrapException extends \LogicException
 
         $summary = str_replace(["\r\n", "\r", "\n"], '\n', $summary);
         if (\strlen($summary) > self::MAX_SUMMARY_LENGTH) {
-            // バイト上限を守りつつ文字境界で切るため mb_strcut を使う（substr だと
-            // マルチバイト文字の途中で切れて不正な UTF-8 になり json_encode が失敗する）.
+            // Use mb_strcut to cut at a character boundary while respecting the byte limit
+            // (substr would cut in the middle of a multibyte character, producing invalid
+            // UTF-8 and making json_encode fail).
             return mb_strcut($summary, 0, self::MAX_SUMMARY_LENGTH, 'UTF-8') . '... (truncated)';
         }
 
@@ -70,8 +71,8 @@ final class UnwrapException extends \LogicException
     }
 
     /**
-     * Stringable の要約を生成します。__toString() が例外を投げてもこの例外を
-     * 置き換えないよう、失敗時はクラス名のみへフォールバックします.
+     * Builds a summary for a Stringable. To avoid replacing this exception when
+     * __toString() throws, it falls back to the class name only on failure.
      */
     private static function describeStringable(\Stringable $value): string
     {
@@ -83,8 +84,8 @@ final class UnwrapException extends \LogicException
     }
 
     /**
-     * クラス名を返します。匿名クラスはファイルパス・行番号を除いた
-     * 「Foo@anonymous」形式に正規化します.
+     * Returns the class name. Anonymous classes are normalized to the
+     * "Foo@anonymous" form, stripping the file path and line number.
      */
     private static function className(object $value): string
     {

@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Valbeat\Result;
 
 /**
- * Result型は、成功（Ok）または失敗（Err）を表現します。
+ * The Result type represents either success (Ok) or failure (Err).
  *
- * 注意: instanceof による絞り込みでは型引数が失われます（PHPStan の既知の制限。
- * Result<int, E> が型引数なしの Ok になり unwrap() は mixed になる）。
- * 値を取り出す分岐では isOk() / isErr() で絞り込んでください。
+ * Note: narrowing via instanceof loses the type arguments (a known PHPStan
+ * limitation; Result<int, E> becomes an Ok without type arguments and unwrap()
+ * returns mixed). In branches that extract the value, narrow with isOk() / isErr().
  *
- * @template-covariant T 成功時の値の型
- * @template-covariant E 失敗時のエラーの型
+ * @template-covariant T the type of the success value
+ * @template-covariant E the type of the error value
  *
  * @phpstan-sealed Ok|Err
  */
 interface Result
 {
     /**
-     * 結果が成功（Ok）の場合に true を返します.
+     * Returns true if the result is a success (Ok).
      *
      * @phpstan-assert-if-true Ok<T> $this
      * @phpstan-assert-if-false Err<E> $this
@@ -29,7 +29,7 @@ interface Result
     public function isOk(): bool;
 
     /**
-     * 結果が成功（Ok）でありコールバックが true を返す場合に true を返します.
+     * Returns true if the result is a success (Ok) and the callback returns true.
      *
      * @param callable(T): bool $fn
      *
@@ -38,7 +38,7 @@ interface Result
     public function isOkAnd(callable $fn): bool;
 
     /**
-     * 結果が失敗（Err）の場合に true を返します.
+     * Returns true if the result is a failure (Err).
      *
      * @phpstan-assert-if-true Err<E> $this
      * @phpstan-assert-if-false Ok<T> $this
@@ -48,7 +48,7 @@ interface Result
     public function isErr(): bool;
 
     /**
-     * 結果が失敗（Err）でありコールバックが true を返す場合に true を返します.
+     * Returns true if the result is a failure (Err) and the callback returns true.
      *
      * @param callable(E): bool $fn
      *
@@ -57,47 +57,47 @@ interface Result
     public function isErrAnd(callable $fn): bool;
 
     /**
-     * 成功値を返します。失敗の場合は例外を投げます.
+     * Returns the success value. Throws an exception on failure.
      *
      * @return ($this is Ok<mixed> ? T : never)
      *
-     * @throws UnwrapException $this が Err の場合
+     * @throws UnwrapException if $this is Err
      */
     public function unwrap(): mixed;
 
     /**
-     * エラー値を返します。成功の場合は例外を投げます.
+     * Returns the error value. Throws an exception on success.
      *
      * @return ($this is Err<mixed> ? E : never)
      *
-     * @throws UnwrapException $this が Ok の場合
+     * @throws UnwrapException if $this is Ok
      */
     public function unwrapErr(): mixed;
 
     /**
-     * 成功値を返します。失敗の場合は指定したメッセージで例外を投げます.
+     * Returns the success value. On failure, throws an exception with the given message.
      *
-     * @param string $message 失敗時の例外メッセージ（エラー値の要約が付加されます）
+     * @param string $message the exception message on failure (a summary of the error value is appended)
      *
      * @return ($this is Ok<mixed> ? T : never)
      *
-     * @throws UnwrapException $this が Err の場合
+     * @throws UnwrapException if $this is Err
      */
     public function expect(string $message): mixed;
 
     /**
-     * エラー値を返します。成功の場合は指定したメッセージで例外を投げます.
+     * Returns the error value. On success, throws an exception with the given message.
      *
-     * @param string $message 成功時の例外メッセージ（成功値の要約が付加されます）
+     * @param string $message the exception message on success (a summary of the success value is appended)
      *
      * @return ($this is Err<mixed> ? E : never)
      *
-     * @throws UnwrapException $this が Ok の場合
+     * @throws UnwrapException if $this is Ok
      */
     public function expectErr(string $message): mixed;
 
     /**
-     * 成功値またはデフォルト値を返します.
+     * Returns the success value or a default value.
      *
      * @template U
      * @param U $default
@@ -106,7 +106,7 @@ interface Result
     public function unwrapOr(mixed $default): mixed;
 
     /**
-     * 成功値またはクロージャーの結果を返します.
+     * Returns the success value or the result of the closure.
      *
      * @template U
      * @param callable(E): U $fn
@@ -116,7 +116,7 @@ interface Result
     public function unwrapOrElse(callable $fn): mixed;
 
     /**
-     * 成功値に関数を適用します.
+     * Applies a function to the success value.
      *
      * @template U
      *
@@ -127,7 +127,7 @@ interface Result
     public function map(callable $fn): self;
 
     /**
-     * エラー値に関数を適用します.
+     * Applies a function to the error value.
      *
      * @template F
      *
@@ -138,7 +138,7 @@ interface Result
     public function mapErr(callable $fn): self;
 
     /**
-     * 成功値に副作用を適用します.
+     * Applies a side effect to the success value.
      *
      * @param callable(T): void $fn
      *
@@ -147,7 +147,7 @@ interface Result
     public function inspect(callable $fn): self;
 
     /**
-     * エラー値に副作用を適用します.
+     * Applies a side effect to the error value.
      *
      * @param callable(E): void $fn
      *
@@ -156,7 +156,7 @@ interface Result
     public function inspectErr(callable $fn): self;
 
     /**
-     * 成功値に関数を適用するか、デフォルト値を返します.
+     * Applies a function to the success value, or returns a default value.
      *
      * @template U
      *
@@ -168,7 +168,7 @@ interface Result
     public function mapOr(mixed $default, callable $fn): mixed;
 
     /**
-     * 成功値に関数を適用するか、クロージャーの結果を返します.
+     * Applies a function to the success value, or returns the result of the closure.
      *
      * @template U
      *
@@ -180,7 +180,7 @@ interface Result
     public function mapOrElse(callable $defaultFn, callable $fn): mixed;
 
     /**
-     * 成功の場合は第2の結果を返し、失敗の場合は最初のエラーを返します.
+     * Returns the second result on success, or the first error on failure.
      *
      * @template U
      * @template F
@@ -192,9 +192,9 @@ interface Result
     public function and(self $res): self;
 
     /**
-     * 成功の場合は関数を適用し、失敗の場合は現在のエラーを返します.
+     * Applies a function on success, or returns the current error on failure.
      *
-     * 関数は元と異なるエラー型を返せます。エラー型は E|F に合成されます.
+     * The function may return a different error type; the error type is combined into E|F.
      *
      * @template U
      * @template F
@@ -206,7 +206,7 @@ interface Result
     public function andThen(callable $fn): self;
 
     /**
-     * 失敗の場合は第2の結果を返し、成功の場合は最初の値を返します.
+     * Returns the second result on failure, or the first value on success.
      *
      * @template U
      * @template F
@@ -218,9 +218,9 @@ interface Result
     public function or(self $res): self;
 
     /**
-     * 失敗の場合は関数を適用し、成功の場合は現在の値を返します.
+     * Applies a function on failure, or returns the current value on success.
      *
-     * 関数は元と異なる成功型を返せます。成功型は T|U に合成されます.
+     * The function may return a different success type; the success type is combined into T|U.
      *
      * @template U
      * @template F
@@ -232,15 +232,15 @@ interface Result
     public function orElse(callable $fn): self;
 
     /**
-     * 成功の場合はokを、失敗の場合はerrを適用します.
+     * Applies ok on success, or err on failure.
      *
      * @template U
      * @template V
      *
-     * @param callable(T): U $ok 成功値に適用する関数
-     * @param callable(E): V $err エラー値に適用する関数
+     * @param callable(T): U $ok the function applied to the success value
+     * @param callable(E): V $err the function applied to the error value
      *
-     * @return U|V 適用された関数の結果
+     * @return U|V the result of the applied function
      */
     public function match(callable $ok, callable $err): mixed;
 }

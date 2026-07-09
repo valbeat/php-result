@@ -103,7 +103,7 @@ class ResultsTest extends TestCase
     }
 
     /**
-     * リテラル型を Result<Result<int, string>, string> に widening するためのヘルパ.
+     * Helper for widening a literal type to Result<Result<int, string>, string>.
      *
      * @param Result<Result<int, string>, string> $result
      *

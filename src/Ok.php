@@ -7,7 +7,7 @@ namespace Valbeat\Result;
 use Override;
 
 /**
- * Ok は成功値を表します.
+ * Ok represents a success value.
  *
  * @template-covariant T
  *

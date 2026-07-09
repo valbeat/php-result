@@ -7,7 +7,7 @@ namespace Valbeat\Result;
 use Override;
 
 /**
- * Err はエラー値を表します.
+ * Err represents an error value.
  *
  * @template-covariant E
  *
