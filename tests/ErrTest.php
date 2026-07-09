@@ -144,7 +144,7 @@ class ErrTest extends TestCase
     #[Test]
     public function unwrap_withLongMultibyteError_keepsValidUtf8Message(): void
     {
-        // 各文字 3 バイトなので、120 バイトの切り詰め境界が文字の途中に落ちる
+        // Each character is 3 bytes, so the 120-byte truncation boundary falls in the middle of a character
         $err = new Err(str_repeat('あ', 200));
 
         try {
@@ -379,7 +379,7 @@ class ErrTest extends TestCase
     }
 
     /**
-     * リテラル型を int に広げます（共変テンプレートは定数型を保持するため）.
+     * Widens a literal type to int (covariant templates preserve constant types).
      */
     private static function asInt(int $value): int
     {
@@ -387,7 +387,7 @@ class ErrTest extends TestCase
     }
 
     /**
-     * リテラル型を string に広げます（共変テンプレートは定数型を保持するため）.
+     * Widens a literal type to string (covariant templates preserve constant types).
      */
     private static function asString(string $value): string
     {
@@ -396,7 +396,7 @@ class ErrTest extends TestCase
 }
 
 /**
- * UnwrapException のメッセージが enum のケース名を含むことを検証するためのフィクスチャ.
+ * Fixture for verifying that the UnwrapException message contains the enum case name.
  */
 enum SampleEnumError
 {

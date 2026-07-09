@@ -288,7 +288,7 @@ class OkTest extends TestCase
     }
 
     /**
-     * リテラル型を int に広げます（共変テンプレートは定数型を保持するため）.
+     * Widens a literal type to int (covariant templates preserve constant types).
      */
     private static function asInt(int $value): int
     {

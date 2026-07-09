@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-language: ja
+language: en-US
 early_access: false
 tone_instructions: |
-  日本語で簡潔かつ建設的にレビューしてください。
-  指摘の根拠（PHPのバージョン依存、型安全性、Result型の不変条件など）を明示してください。
+  Review concisely and constructively.
+  Make the rationale for each comment explicit (PHP version dependencies, type safety, Result type invariants, etc.).
 
 reviews:
   profile: assertive
@@ -29,24 +29,24 @@ reviews:
   path_instructions:
     - path: "src/**/*.php"
       instructions: |
-        - PHP 8.4 以上の構文・機能を前提にレビューする。
-        - Rust の Result<T, E> に倣った API 設計を尊重し、Ok / Err / Result の不変条件を崩していないか確認する。
-        - 例外による暗黙のエラー伝播ではなく、Result 型での明示的なエラーハンドリングを推奨する。
-        - readonly / final / 型宣言（戻り値・引数・プロパティ）の徹底をチェックする。
-        - 公開 API の破壊的変更がある場合は明示的に指摘する。
+        - Review assuming PHP 8.4+ syntax and features.
+        - Respect the API design modeled after Rust's Result<T, E>, and check that the Ok / Err / Result invariants are not broken.
+        - Prefer explicit error handling via the Result type over implicit error propagation through exceptions.
+        - Check for thorough use of readonly / final / type declarations (return, parameter, and property types).
+        - Explicitly point out any breaking changes to the public API.
     - path: "tests/**/*.php"
       instructions: |
-        - PHPUnit のテストとして、t-wada 流 TDD の Red→Green→Refactor を意識しているかをチェックする。
-        - 1 テスト 1 アサーション主義に偏りすぎず、振る舞い単位で検証されているか確認する。
-        - エッジケース（Ok/Err 双方、ネスト、map/and_then などのコンビネータ）が網羅されているかを見る。
+        - As PHPUnit tests, check whether they follow t-wada-style TDD's Red→Green→Refactor.
+        - Without over-adhering to one-assertion-per-test dogma, check that they verify behavior units.
+        - Check that edge cases are covered (both Ok/Err, nesting, combinators such as map/and_then).
     - path: "**/*.md"
       instructions: |
-        - サンプルコードは PHP 8.4+ で実行可能か確認する。
-        - README の API 説明と src の実装が一致しているかを確認する。
+        - Check that sample code is runnable on PHP 8.4+.
+        - Check that the README's API descriptions match the implementation in src.
     - path: ".github/workflows/**"
       instructions: |
-        - 使用するアクションはバージョンを固定（SHA か明示的なタグ）しているかを確認する。
-        - secrets の取り扱いに不適切なものがないかをチェックする。
+        - Check that the actions used are version-pinned (by SHA or an explicit tag).
+        - Check for any improper handling of secrets.
 
   tools:
     phpstan:

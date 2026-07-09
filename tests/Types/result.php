@@ -16,8 +16,8 @@ use Valbeat\Result\Result;
 use Valbeat\Result\Results;
 
 /**
- * 共変性のテスト: Ok<int> (= Result<int, never>) を
- * Result<int, RuntimeException> として返せる.
+ * Covariance test: an Ok<int> (= Result<int, never>) can be
+ * returned as a Result<int, RuntimeException>.
  *
  * @return Result<int, RuntimeException>
  */
@@ -48,7 +48,7 @@ function findNameById(int $id): Result
  */
 function testAndThenComposesErrorTypes(Result $result): void
 {
-    // andThen は異なるエラー型を返すコールバックを受け取れ、エラー型は E|F に合成される
+    // andThen accepts a callback that returns a different error type; the error type is combined into E|F
     $chained = $result->andThen(findNameById(...));
     assertType('Valbeat\Result\Result<string, LogicException|RuntimeException>', $chained);
 }
@@ -67,7 +67,7 @@ function testAndComposesErrorTypes(Result $result, Result $other): void
  */
 function testOrElseComposesSuccessTypes(Result $result): void
 {
-    // orElse は異なる成功型を返すコールバックを受け取れ、成功型は T|U に合成される
+    // orElse accepts a callback that returns a different success type; the success type is combined into T|U
     $recovered = $result->orElse(static fn (RuntimeException $e): Result => findNameById(0));
     assertType('Valbeat\Result\Result<int|string, LogicException>', $recovered);
 }
@@ -96,7 +96,7 @@ function testIsOkNarrowing(Result $result): void
 }
 
 /**
- * isErr によるナローイング: true 側で Err、false 側で Ok に絞り込まれる.
+ * Narrowing via isErr: narrowed to Err on the true branch and Ok on the false branch.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -112,8 +112,8 @@ function testIsErrNarrowing(Result $result): void
 }
 
 /**
- * 既知の制限: instanceof Ok の true 側分岐ではジェネリクスが失われ、unwrap は mixed になる.
- * 型引数を保ったまま絞り込みたい場合は isOk() / isErr() を使う（testIsOkNarrowing 参照）.
+ * Known limitation: on the true branch of instanceof Ok the generics are lost, and unwrap becomes mixed.
+ * To narrow while preserving the type arguments, use isOk() / isErr() (see testIsOkNarrowing).
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -126,7 +126,7 @@ function testInstanceofOkNarrowing(Result $result): void
 }
 
 /**
- * sealed のテスト: instanceof Ok の else 分岐で Err に絞り込まれる.
+ * Sealed test: on the else branch of instanceof Ok, narrowed to Err.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -135,14 +135,14 @@ function testInstanceofNarrowing(Result $result): bool
     if ($result instanceof Ok) {
         return true;
     }
-    // sealed の効果: instanceof Ok の else 分岐で Err に絞り込まれる
+    // Effect of sealed: on the else branch of instanceof Ok, narrowed to Err
     assertType('Valbeat\Result\Err', $result);
 
     return false;
 }
 
 /**
- * sealed の効果: Ok と Err で全ケース網羅と判断され、match が非網羅エラーにならない.
+ * Effect of sealed: Ok and Err are deemed to cover all cases, so match does not raise a non-exhaustive error.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -155,8 +155,8 @@ function testExhaustiveMatch(Result $result): string
 }
 
 /**
- * 既知の制限: match 式の instanceof アームではジェネリクスが失われ mixed になる.
- * 型引数を保ちたい場合は isOk() アームを使う（testMatchArmNarrowingWithIsOk 参照）.
+ * Known limitation: in a match expression's instanceof arm the generics are lost and become mixed.
+ * To preserve the type arguments, use an isOk() arm (see testMatchArmNarrowingWithIsOk).
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -170,7 +170,7 @@ function testMatchArmNarrowing(Result $result): void
 }
 
 /**
- * match 式のアーム内ナローイング: isOk() でも assert-if-true が効く.
+ * In-arm narrowing in a match expression: assert-if-true also works with isOk().
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -184,7 +184,7 @@ function testMatchArmNarrowingWithIsOk(Result $result): void
 }
 
 /**
- * match() メソッドの戻り値は両コールバックの戻り値型 U|V に合成される.
+ * The return value of the match() method is combined into U|V from both callbacks' return types.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -198,7 +198,7 @@ function testMatchMethodComposesReturnTypes(Result $result, float $fallback): vo
 }
 
 /**
- * inspect / inspectErr は型を変えない.
+ * inspect / inspectErr do not change the type.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -211,7 +211,7 @@ function testInspectPreservesType(Result $result): void
 }
 
 /**
- * isOkAnd / isErrAnd / inspect のコールバック引数の型が推論される.
+ * The callback parameter types of isOkAnd / isErrAnd / inspect are inferred.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -236,7 +236,7 @@ function testCallbackParamInference(Result $result): void
 }
 
 /**
- * コンストラクタからの型推論: new Ok / new Err で型引数が決まる.
+ * Type inference from the constructor: new Ok / new Err determine the type arguments.
  */
 function testConstructorInference(int $value, RuntimeException $error): void
 {
@@ -245,7 +245,7 @@ function testConstructorInference(int $value, RuntimeException $error): void
 }
 
 /**
- * ジェネリック Result レシーバでの unwrap / unwrapErr は条件付き戻り値型が解決される.
+ * unwrap / unwrapErr on a generic Result receiver resolve their conditional return types.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -256,7 +256,7 @@ function testUnwrapOnGenericReceiver(Result $result): void
 }
 
 /**
- * expect / expectErr も unwrap / unwrapErr と同じ条件付き戻り値型が解決される.
+ * expect / expectErr resolve the same conditional return types as unwrap / unwrapErr.
  *
  * @param Result<int, RuntimeException> $result
  */
@@ -267,7 +267,7 @@ function testExpectOnGenericReceiver(Result $result): void
 }
 
 /**
- * 具象レシーバでの unwrapOr / unwrapOrElse: 実行時に起こり得ない側の型を混ぜない.
+ * unwrapOr / unwrapOrElse on a concrete receiver: do not mix in the type of the branch that cannot occur at runtime.
  *
  * @param Ok<int> $ok
  * @param Err<RuntimeException> $err
@@ -283,7 +283,7 @@ function testConcreteUnwrapVariants(Ok $ok, Err $err, string $default, float $fa
 }
 
 /**
- * ネストした Result の平坦化: andThen が内側の成功型と両エラー型の合成を推論できる.
+ * Flattening a nested Result: andThen can infer the inner success type and the combination of both error types.
  *
  * @param Result<Result<int, RuntimeException>, LogicException> $nested
  */
@@ -294,39 +294,39 @@ function testNestedResultFlattening(Result $nested): void
 }
 
 /**
- * 具象 Ok レシーバでは no-op 側のメソッドが実行時に起こり得ない型を混ぜない.
+ * On a concrete Ok receiver, the no-op-side methods do not mix in types that cannot occur at runtime.
  *
  * @param Ok<int> $ok
  */
 function testConcreteOkPrecision(Ok $ok): void
 {
-    // or/orElse は $this を返すため Ok<int> のまま
+    // or/orElse return $this, so it stays Ok<int>
     assertType('Valbeat\Result\Ok<int>', $ok->orElse(static fn (never $e): Result => findNameById(0)));
     assertType('Valbeat\Result\Ok<int>', $ok->or(findNameById(0)));
-    // mapErr は no-op
+    // mapErr is a no-op
     assertType('Valbeat\Result\Ok<int>', $ok->mapErr(static fn (never $e): LogicException => $e));
-    // map は Ok<U> を返す
+    // map returns Ok<U>
     assertType('Valbeat\Result\Ok<string>', $ok->map(stringify(...)));
-    // mapOr/mapOrElse は常に $fn の結果（デフォルト値の型は混ざらない）
+    // mapOr/mapOrElse always yield the result of $fn (the default value's type is not mixed in)
     assertType('string', $ok->mapOr(0.5, stringify(...)));
     assertType('string', $ok->mapOrElse(static fn (): float => 0.5, stringify(...)));
 }
 
 /**
- * 具象 Err レシーバでは no-op 側のメソッドが実行時に起こり得ない型を混ぜない.
+ * On a concrete Err receiver, the no-op-side methods do not mix in types that cannot occur at runtime.
  *
  * @param Err<RuntimeException> $err
  */
 function testConcreteErrPrecision(Err $err, float $fallback): void
 {
-    // and/andThen は $this を返すため Err<RuntimeException> のまま
+    // and/andThen return $this, so it stays Err<RuntimeException>
     assertType('Valbeat\Result\Err<RuntimeException>', $err->andThen(static fn (never $v): Result => findNameById(0)));
     assertType('Valbeat\Result\Err<RuntimeException>', $err->and(findNameById(0)));
-    // map は no-op
+    // map is a no-op
     assertType('Valbeat\Result\Err<RuntimeException>', $err->map(static fn (never $v): int => $v));
-    // mapErr は Err<F> を返す
+    // mapErr returns Err<F>
     assertType('Valbeat\Result\Err<LogicException>', $err->mapErr(static fn (RuntimeException $e): LogicException => new LogicException($e->getMessage())));
-    // mapOr/mapOrElse は常にデフォルト側（$fn の戻り値型は混ざらない）
+    // mapOr/mapOrElse always yield the default side (the return type of $fn is not mixed in)
     assertType('float', $err->mapOr($fallback, static fn (never $v): string => $v));
     assertType('float', $err->mapOrElse(static fn (): float => $fallback, static fn (never $v): string => $v));
 }
@@ -362,7 +362,7 @@ function testMap(Result $result): void
 }
 
 /**
- * エラー側の網羅性テスト用フィクスチャ: native enum.
+ * Fixture for error-side exhaustiveness tests: native enum.
  */
 enum HttpError
 {
@@ -371,7 +371,7 @@ enum HttpError
 }
 
 /**
- * エラー側の網羅性テスト用フィクスチャ: @phpstan-sealed なエラー union.
+ * Fixture for error-side exhaustiveness tests: a @phpstan-sealed error union.
  *
  * @phpstan-sealed ValidationFailure|NetworkFailure
  */
@@ -388,9 +388,9 @@ final class NetworkFailure implements AppError
 }
 
 /**
- * エラー型が native enum の場合: isErr() 経由なら unwrapErr() が enum 型を保ち、
- * 全ケースを網羅する match は default なしで網羅と認識される.
- * （いずれかのケースを落とすと phpstan analyse がエラーになるため、これ自体が網羅性のピン留めになる）
+ * When the error type is a native enum: via isErr(), unwrapErr() preserves the enum type, and
+ * a match covering all cases is recognized as exhaustive without a default.
+ * (Dropping any case makes phpstan analyse fail, so this itself pins down the exhaustiveness.)
  *
  * @param Result<int, HttpError> $result
  */
@@ -410,8 +410,8 @@ function testEnumErrorExhaustiveness(Result $result): string
 }
 
 /**
- * エラー型が @phpstan-sealed union の場合: isErr() 経由で取り出した値に対する
- * match(true)+instanceof が網羅と認識される（sealed 指定が前提。エラークラスは非ジェネリックなので型引数喪失は起きない）.
+ * When the error type is a @phpstan-sealed union: for a value extracted via isErr(),
+ * match(true)+instanceof is recognized as exhaustive (the sealed annotation is required; the error classes are non-generic, so no type-argument loss occurs).
  *
  * @param Result<int, AppError> $result
  */
@@ -431,8 +431,8 @@ function testSealedErrorExhaustiveness(Result $result): string
 }
 
 /**
- * 既知の落とし穴のピン留め（enum エラー）: instanceof Err では E が失われ、
- * enum であっても unwrapErr() は mixed になる。値を扱う分岐は isErr() を使う（上の2ケース参照）.
+ * Pinning down a known pitfall (enum error): with instanceof Err, E is lost, and even for an
+ * enum unwrapErr() becomes mixed. In branches that handle the value, use isErr() (see the two cases above).
  *
  * @param Result<int, HttpError> $result
  */
@@ -444,8 +444,8 @@ function testInstanceofErrLosesEnumErrorType(Result $result): void
 }
 
 /**
- * 既知の落とし穴のピン留め（sealed エラー）: sealed union でも instanceof Err では
- * E が失われ unwrapErr() は mixed になる.
+ * Pinning down a known pitfall (sealed error): even with a sealed union, instanceof Err
+ * loses E and unwrapErr() becomes mixed.
  *
  * @param Result<int, AppError> $result
  */
@@ -457,7 +457,7 @@ function testInstanceofErrLosesSealedErrorType(Result $result): void
 }
 
 /**
- * Results::try は戻り値の型を Ok 側に、送出されうる例外を Throwable として Err 側に推論する.
+ * Results::try infers the return type on the Ok side and the potentially thrown exception as Throwable on the Err side.
  */
 function testTryInference(): void
 {
@@ -465,7 +465,7 @@ function testTryInference(): void
 }
 
 /**
- * Results::combine は iterable<Result<T, E>> から Result<list<T>, E> を推論する.
+ * Results::combine infers Result<list<T>, E> from iterable<Result<T, E>>.
  *
  * @param list<Result<int, RuntimeException>> $results
  */
@@ -475,7 +475,7 @@ function testCombineInference(array $results): void
 }
 
 /**
- * Results::flatten はネストした Result の内側の成功型と両エラー型の合成を推論する.
+ * Results::flatten infers the inner success type of a nested Result and the combination of both error types.
  *
  * @param Result<Result<int, RuntimeException>, LogicException> $nested
  */

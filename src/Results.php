@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Valbeat\Result;
 
 /**
- * Result を生成・合成する静的ヘルパーです.
+ * Static helpers for creating and composing Results.
  */
 final class Results
 {
     /**
-     * 静的ヘルパーのためインスタンス化を禁止します.
+     * Prevents instantiation since this is a static helper.
      *
      * @codeCoverageIgnore
      */
@@ -19,10 +19,10 @@ final class Results
     }
 
     /**
-     * 例外を投げうる処理を実行し、結果を Result に包みます.
+     * Executes a callable that may throw and wraps the result in a Result.
      *
-     * 成功時は戻り値を Ok に、\Throwable が送出された場合は Err に包んで返します.
-     * 例外ベースの既存コードを Result の世界に持ち込む入口として使います.
+     * On success the return value is wrapped in Ok; if a \Throwable is thrown it is wrapped in Err.
+     * Use it as an entry point for bringing existing exception-based code into the Result world.
      *
      * @template T
      *
@@ -40,9 +40,9 @@ final class Results
     }
 
     /**
-     * 複数の Result を 1 つに合成します.
+     * Combines multiple Results into one.
      *
-     * すべて成功なら値のリストを Ok で返し、失敗が含まれる場合は最初の Err を返します.
+     * If all are successes, returns the list of values as an Ok; if any failure is present, returns the first Err.
      *
      * @template T
      * @template E
@@ -65,11 +65,11 @@ final class Results
     }
 
     /**
-     * ネストした Result を 1 段平坦化します.
+     * Flattens a nested Result by one level.
      *
-     * インスタンスメソッドにしないのは、PHPStan の条件型ではテンプレート T を
-     * Result<U, F> に分解できない（infer がない）ため。静的ヘルパーなら
-     * パラメータ側のテンプレートで内側の型を正確に推論できます.
+     * This is not an instance method because PHPStan's conditional types cannot
+     * decompose the template T into Result<U, F> (there is no infer). As a static
+     * helper, the inner type can be inferred precisely from the parameter-side template.
      *
      * @template T
      * @template E1
